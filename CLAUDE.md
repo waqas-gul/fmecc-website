@@ -31,7 +31,8 @@ Frontend-only corporate website for Future Middle East Construction Company. Nex
 - Implement the contracts in ARCHITECTURE.md §6–§8 exactly. Changing a contract means updating ARCHITECTURE.md and every consumer in the same change.
 - Before creating a component, search `src/shared/ui` and the target layer. Duplicates are not accepted; extend or compose instead.
 - Route strings come from `routes.*` in `src/shared/config/routes.ts`; `href`s are typed.
-- Server Components by default; `'use client'` only for state, effects, browser APIs, GSAP, Motion or three.js. Keep client files small and pass serializable props.
+- Server Components by default; `'use client'` only for state, effects, browser APIs, GSAP, Motion or three.js. Keep client files small and pass serializable props (a `Service` holds an icon component: pass its fields, not the object).
+- Import GSAP only from `@/shared/lib/gsap`, and only in client components that use it. Any new module with top-level side effects must be listed under `sideEffects` in `package.json`, or tree-shaking will drop it.
 - Do not add packages. Approved: `gsap`, `three`, `@react-three/fiber`, `@react-three/drei`, `@types/three`, `motion`, `lucide-react`, `sharp` (dev). Anything else needs an explicit request from the user.
 
 ## Content and claims
@@ -42,6 +43,7 @@ Frontend-only corporate website for Future Middle East Construction Company. Nex
 
 ## Component quality
 - Mobile first; verify 360, 768, 1024, 1280, 1536 px; no horizontal overflow; touch targets ≥ 44 px.
+- `className` on shared components is for layout; hide them responsively with variants (`max-lg:hidden`), never base display classes like `hidden`.
 - Use semantic tokens (`bg-surface`, `text-ink`, `border-line`, `bg-accent`, `text-accent-text`, `text-highlight`) and `data-scheme`, never raw palette colours for surfaces and text. Cyan is never text on light surfaces and never a button fill; Purple appears only in the spectrum gradient and one selected accent per page.
 - Accessible by default: semantic landmarks, one `h1`, visible focus, keyboard operation, `aria-*` on menus, accordions and forms, meaningful `alt`, `aria-hidden` on canvases with a text alternative.
 - Every animation has a correct CSS resting state, honours `prefers-reduced-motion`, animates `transform`/`opacity` only, and cleans up (`ctx.revert()`, `ScrollTrigger.kill()`, three.js `dispose()`).

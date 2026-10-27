@@ -1,0 +1,120 @@
+/*
+ * FMECC design tokens (planning/DESIGN.md §2–§4, §10).
+ * The five approved logo colours are the anchors: Deep Navy, White, Royal Blue, Cyan, Purple.
+ * Every other step exists only for contrast. Tailwind's default palette and type scale are
+ * removed, so utilities can only use these tokens.
+ */
+
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+
+  --color-navy-950: #070b14;
+  --color-navy-900: #0b1220; /* Deep Navy */
+  --color-navy-800: #121c33;
+  --color-navy-700: #1a2749;
+
+  --color-blue-700: #0e37ae;
+  --color-blue-600: #1246d8; /* Royal Blue */
+  --color-blue-500: #2e5be8;
+  --color-blue-300: #8fb0ff;
+  --color-blue-100: #dce6ff;
+  --color-blue-50: #eef3ff;
+
+  --color-cyan-800: #087078;
+  --color-cyan-500: #13c9d7; /* Cyan */
+  --color-cyan-300: #7fe3ec;
+  --color-cyan-100: #ddf8fa;
+
+  --color-purple-600: #7a1fd0;
+  --color-purple-500: #8b25e8; /* Purple */
+  --color-purple-300: #c79bff;
+
+  --color-neutral-950: #10141c;
+  --color-neutral-700: #4b5262;
+  --color-neutral-500: #6b7281;
+  --color-neutral-400: #8a94ab;
+  --color-neutral-300: #c7cdd8;
+  --color-neutral-200: #dfe3ea;
+  --color-neutral-100: #f1f3f7;
+  --color-neutral-50: #f7f8fa;
+
+  /* Form error state (DESIGN.md §7.3); the 300 step keeps errors legible on dark schemes. */
+  --color-danger-600: #b42318;
+  --color-danger-300: #f97066;
+
+  --text-*: initial;
+  --text-display-xl: clamp(2.75rem, 2rem + 3.5vw, 5.5rem);
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-lg: clamp(2.25rem, 1.6rem + 2.6vw, 4rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.025em;
+  --text-heading-md: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  --text-heading-md--line-height: 1.15;
+  --text-heading-md--letter-spacing: -0.015em;
+  --text-heading-sm: 1.25rem;
+  --text-heading-sm--line-height: 1.3;
+  --text-heading-sm--letter-spacing: -0.01em;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.5;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.14em;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  --shadow-raised: 0 18px 40px -18px rgb(7 11 20 / 0.35), 0 2px 8px -2px rgb(7 11 20 / 0.12);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --animate-rise: rise 0.9s var(--ease-out-expo) both;
+  --animate-draw: draw 1.2s var(--ease-out-expo) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1rem, 0);
+    }
+  }
+
+  @keyframes draw {
+    from {
+      transform: scaleX(0);
+    }
+  }
+}
+
+/* Families come from next/font variables set on <html>; semantic colours remap per data-scheme. */
+@theme inline {
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-surface-inverse-hover: var(--surface-inverse-hover);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-inverse: var(--ink-inverse);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
+  --color-accent-ink: var(--accent-ink);
+  --color-highlight: var(--highlight);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+}

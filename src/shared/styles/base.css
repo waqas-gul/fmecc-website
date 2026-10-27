@@ -1,0 +1,213 @@
+/*
+ * Scheme variables, base element styles and project utilities
+ * (planning/DESIGN.md §2.3, §2.4, §4, §13). Components use the semantic utilities
+ * (bg-surface, text-ink, border-line, bg-accent, text-accent-text, text-highlight)
+ * and set data-scheme on a section to switch between light, dark and brand.
+ */
+
+@layer base {
+  :root,
+  [data-scheme="light"] {
+    color-scheme: light;
+    --surface: var(--color-white);
+    --surface-muted: var(--color-neutral-100);
+    --surface-raised: var(--color-white);
+    --surface-inverse: var(--color-navy-900);
+    --surface-inverse-hover: var(--color-navy-800);
+    --ink: var(--color-neutral-950);
+    --ink-muted: var(--color-neutral-700);
+    --ink-subtle: var(--color-neutral-500);
+    --ink-inverse: var(--color-white);
+    --line: var(--color-neutral-200);
+    --line-strong: var(--color-neutral-300);
+    --accent: var(--color-blue-600);
+    --accent-hover: var(--color-blue-700);
+    --accent-text: var(--color-blue-600);
+    --accent-ink: var(--color-white);
+    --highlight: var(--color-cyan-800);
+    --focus: var(--color-blue-600);
+    --danger: var(--color-danger-600);
+    --spectrum: linear-gradient(90deg, var(--color-purple-500), var(--color-blue-600), var(--color-cyan-500));
+  }
+
+  [data-scheme="dark"] {
+    color-scheme: dark;
+    --surface: var(--color-navy-950);
+    --surface-muted: var(--color-navy-900);
+    --surface-raised: var(--color-navy-800);
+    --surface-inverse: var(--color-white);
+    --surface-inverse-hover: var(--color-neutral-100);
+    --ink: var(--color-white);
+    --ink-muted: var(--color-neutral-300);
+    --ink-subtle: var(--color-neutral-400);
+    --ink-inverse: var(--color-navy-950);
+    --line: rgb(255 255 255 / 0.12);
+    --line-strong: rgb(255 255 255 / 0.24);
+    --accent: var(--color-blue-500);
+    --accent-hover: var(--color-blue-600);
+    --accent-text: var(--color-blue-300);
+    --accent-ink: var(--color-white);
+    --highlight: var(--color-cyan-500);
+    --focus: var(--color-cyan-500);
+    --danger: var(--color-danger-300);
+    --spectrum: linear-gradient(90deg, var(--color-purple-300), var(--color-blue-300), var(--color-cyan-300));
+  }
+
+  [data-scheme="brand"] {
+    color-scheme: dark;
+    --surface: var(--color-navy-900);
+    --surface-muted: var(--color-navy-800);
+    --surface-raised: var(--color-navy-800);
+    --surface-inverse: var(--color-white);
+    --surface-inverse-hover: var(--color-neutral-100);
+    --ink: var(--color-white);
+    --ink-muted: var(--color-blue-100);
+    --ink-subtle: rgb(220 230 255 / 0.7);
+    --ink-inverse: var(--color-navy-950);
+    --line: rgb(255 255 255 / 0.14);
+    --line-strong: rgb(255 255 255 / 0.28);
+    --accent: var(--color-blue-500);
+    --accent-hover: var(--color-blue-600);
+    --accent-text: var(--color-blue-300);
+    --accent-ink: var(--color-white);
+    --highlight: var(--color-cyan-500);
+    --focus: var(--color-cyan-500);
+    --danger: var(--color-danger-300);
+    --spectrum: linear-gradient(90deg, var(--color-purple-300), var(--color-blue-300), var(--color-cyan-300));
+  }
+
+  :root {
+    --header-h: 4rem;
+    --gutter: 1rem;
+    --z-raised: 10;
+    --z-header: 40;
+    --z-overlay: 50;
+    --z-menu: 60;
+    --z-toast: 70;
+    --z-skip: 100;
+  }
+
+  @media (width >= 40rem) {
+    :root {
+      --gutter: 1.5rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    :root {
+      --header-h: 5rem;
+      --gutter: 2.5rem;
+    }
+  }
+
+  @media (width >= 96rem) {
+    :root {
+      --gutter: 4rem;
+    }
+  }
+
+  html {
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  [data-scheme] {
+    color: var(--ink);
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--line);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-blue-100);
+    color: var(--color-navy-950);
+  }
+
+  /* Adjacent sections with the same scheme share a 1 px rule (DESIGN.md §4). */
+  [data-section][data-scheme="light"] + [data-section][data-scheme="light"],
+  [data-section][data-scheme="dark"] + [data-section][data-scheme="dark"],
+  [data-section][data-scheme="brand"] + [data-section][data-scheme="brand"] {
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* Mono uppercase labels: eyebrows, navigation, counters (DESIGN.md §3). */
+@utility type-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Container widths with responsive gutters (DESIGN.md §4). */
+@utility shell-content {
+  width: 100%;
+  max-width: calc(80rem + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility shell-wide {
+  width: 100%;
+  max-width: calc(90rem + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility shell-full {
+  width: 100%;
+  padding-inline: var(--gutter);
+}
+
+/* Spectrum gradient: rules of 2 px or less, and one display word per page on dark schemes (DESIGN.md §2.4). */
+@utility spectrum-fill {
+  background-image: var(--spectrum);
+}
+
+@utility spectrum-text {
+  background-image: var(--spectrum);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
