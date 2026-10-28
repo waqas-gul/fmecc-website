@@ -40,7 +40,8 @@ export function ProcessSection({
         poster={poster}
         sceneLabel={processContent.sceneLabel}
         stepLabel={processContent.stepLabel}
-        className="mt-14 lg:mt-20"
+        // With a scene, the pinned frame's header band is the top spacing below 1024 px.
+        className={scene ? "lg:mt-20" : "mt-14 lg:mt-20"}
       >
         <ol data-animate="process-list" className="relative">
           {steps.map((step, index) => (

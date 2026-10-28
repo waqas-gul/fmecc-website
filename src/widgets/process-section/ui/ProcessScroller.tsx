@@ -117,15 +117,39 @@ export function ProcessScroller({
     [scene, total],
   );
 
+  // Below 1024 px the steps and the visual stack. A scene leads in a short frame that, in portrait,
+  // pins under a header-high band while the steps scroll beneath it, so the tower is seen assembling.
+  // A poster alone follows the steps on phones and leads them on tablets.
+  const pinned = Boolean(scene);
+
   return (
-    <div ref={scopeRef} className={cn("grid gap-12 lg:grid-cols-12 lg:gap-8", className)}>
+    <div
+      ref={scopeRef}
+      // Flex when pinned below 1024 px: a sticky grid item cannot leave its own row.
+      className={cn("grid gap-12 lg:grid-cols-12 lg:gap-8", pinned && "max-lg:flex max-lg:flex-col", className)}
+    >
       <div className={poster ? "lg:col-span-6 xl:col-span-5" : "lg:col-span-8"}>{children}</div>
 
       {poster && (
-        <div className="md:max-lg:order-first lg:col-span-6 lg:col-start-7">
-          {/* Phones read the steps first and meet the visual below them; tablets keep it above. */}
-          {/* 4:5 at every width, matching the scene posters; capped on tablets so it stays in view. */}
-          <div className="relative mx-auto aspect-[4/5] w-full overflow-hidden rounded-md border border-line md:max-w-md lg:sticky lg:top-[calc(var(--header-h)_+_2rem)] lg:max-h-[calc(100svh_-_var(--header-h)_-_4rem)] lg:max-w-none">
+        <div
+          className={cn(
+            "lg:col-span-6 lg:col-start-7",
+            pinned
+              ? "max-lg:order-first max-lg:bg-surface max-lg:pt-[calc(var(--header-h)_+_0.75rem)] max-lg:pb-4"
+              : "md:max-lg:order-first",
+            pinned && scrubbing && "max-lg:portrait:sticky max-lg:portrait:top-0 max-lg:portrait:z-(--z-raised)",
+          )}
+        >
+          {/* 4:5 from 1024 px, matching the scene posters. Pinned, the frame is short and full width:
+              the scene keeps the whole tower in view and the poster is letterboxed, not cropped. */}
+          <div
+            className={cn(
+              "relative w-full overflow-hidden rounded-md border border-line lg:sticky lg:top-[calc(var(--header-h)_+_2rem)] lg:max-h-[calc(100svh_-_var(--header-h)_-_4rem)]",
+              pinned
+                ? "h-[clamp(12rem,32svh,20rem)] lg:aspect-[4/5] lg:h-auto max-lg:[&_img]:object-contain"
+                : "mx-auto aspect-[4/5] md:max-w-md lg:max-w-none",
+            )}
+          >
             {scene ? (
               <div className="absolute inset-0">
                 <LazyScene load={scene} poster={poster} label={sceneLabel} progress={progress} className="h-full w-full" />
@@ -147,7 +171,7 @@ export function ProcessScroller({
               <div
                 aria-hidden
                 data-scheme="dark"
-                className="absolute inset-x-0 top-0 flex items-start justify-between gap-6 bg-linear-to-b from-navy-950/60 to-transparent p-8 pb-16 transition-opacity duration-250 starting:opacity-0"
+                className="absolute inset-x-0 top-0 flex items-start justify-between gap-6 bg-linear-to-b from-navy-950/60 to-transparent p-6 pb-12 transition-opacity duration-250 starting:opacity-0 lg:p-8 lg:pb-16"
               >
                 <span className="type-label text-highlight tabular-nums">
                   {stepLabel} {pad(current)} / {pad(total)}
@@ -156,6 +180,14 @@ export function ProcessScroller({
               </div>
             )}
           </div>
+
+          {/* Soft edge the steps fade under while the frame is pinned. */}
+          {pinned && scrubbing && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-full h-6 bg-linear-to-b from-surface to-transparent lg:hidden landscape:hidden"
+            />
+          )}
         </div>
       )}
     </div>
