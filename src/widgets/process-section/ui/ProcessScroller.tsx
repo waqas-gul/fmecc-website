@@ -122,7 +122,8 @@ export function ProcessScroller({
       <div className={poster ? "lg:col-span-6 xl:col-span-5" : "lg:col-span-8"}>{children}</div>
 
       {poster && (
-        <div className="max-lg:order-first lg:col-span-6 lg:col-start-7">
+        <div className="md:max-lg:order-first lg:col-span-6 lg:col-start-7">
+          {/* Phones read the steps first and meet the visual below them; tablets keep it above. */}
           {/* 4:5 at every width, matching the scene posters; capped on tablets so it stays in view. */}
           <div className="relative mx-auto aspect-[4/5] w-full overflow-hidden rounded-md border border-line md:max-w-md lg:sticky lg:top-[calc(var(--header-h)_+_2rem)] lg:max-h-[calc(100svh_-_var(--header-h)_-_4rem)] lg:max-w-none">
             {scene ? (
