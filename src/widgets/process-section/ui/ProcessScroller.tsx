@@ -1,0 +1,161 @@
+"use client";
+
+import { useState } from "react";
+
+import { mediaQueries, motionTokens } from "@/shared/lib/animation";
+import { gsap, ScrollTrigger, useGsap } from "@/shared/lib/gsap";
+import { cn } from "@/shared/lib/utils";
+import { LazyScene, type SceneLoader } from "@/shared/three";
+import type { ImageAsset } from "@/shared/types/media";
+import { MediaImage } from "@/shared/ui";
+
+/** Viewport line the process fill follows: a step lights up when its node crosses it. */
+const LINE = "60%";
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+const corners = [
+  "top-3 left-3 border-t border-l",
+  "top-3 right-3 border-t border-r",
+  "bottom-3 left-3 border-b border-l",
+  "bottom-3 right-3 border-b border-r",
+] as const;
+
+/**
+ * Scroll layer of the process section (planning/DESIGN.md §8, row 4). Children are the
+ * server-rendered step list; this island scrubs the rail segments between nodes, lights each node
+ * as it crosses the viewport line, and passes the same progress (0–1) to the tower scene. The
+ * visual stays in view with CSS `position: sticky`, so the section never pins. Without JavaScript
+ * or with reduced motion, the list rests in its end state: every segment filled, every node lit.
+ */
+export function ProcessScroller({
+  stepTitles,
+  scene,
+  poster,
+  sceneLabel,
+  stepLabel,
+  className,
+  children,
+}: {
+  stepTitles: string[];
+  scene?: SceneLoader;
+  poster?: ImageAsset;
+  sceneLabel: string;
+  stepLabel: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const [progress, setProgress] = useState(0);
+  const [reached, setReached] = useState(stepTitles.length);
+  const [scrubbing, setScrubbing] = useState(false);
+  const total = stepTitles.length;
+  const current = Math.min(Math.max(reached, 1), total);
+
+  const scopeRef = useGsap<HTMLDivElement>(
+    (_ctx, scope) => {
+      const list = scope.querySelector("[data-animate='process-list']");
+      const nodes = gsap.utils.toArray<HTMLElement>("[data-animate='process-node']", scope);
+      const segments = gsap.utils.toArray<HTMLElement>("[data-animate='process-segment']", scope);
+      if (!list || nodes.length === 0) return;
+
+      gsap.matchMedia().add(mediaQueries.motionOk, () => {
+        const nodeTriggers: ScrollTrigger[] = [];
+        // Counted from the scroll position, not toggle callbacks: a fast jump can pass a node's
+        // whole trigger range without toggling it.
+        const sync = () => setReached(nodeTriggers.filter((trigger) => trigger.scroll() >= trigger.start).length);
+
+        segments.forEach((segment) => {
+          gsap.fromTo(
+            segment.firstElementChild,
+            { scaleY: 0 },
+            { scaleY: 1, ease: "none", scrollTrigger: { trigger: segment, start: `top ${LINE}`, end: `bottom ${LINE}`, scrub: 0.6 } },
+          );
+        });
+
+        nodes.forEach((node) => {
+          const tween = gsap.fromTo(
+            node.firstElementChild,
+            { scale: 0, opacity: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: motionTokens.duration.ui,
+              ease: motionTokens.ease.outExpo,
+              scrollTrigger: {
+                trigger: node,
+                start: `center ${LINE}`,
+                toggleActions: "play none none reverse",
+                onToggle: sync,
+                onRefresh: sync,
+              },
+            },
+          );
+          if (tween.scrollTrigger) nodeTriggers.push(tween.scrollTrigger);
+        });
+
+        // Whole-list progress: drives the scene and re-counts reached nodes on every scroll update.
+        ScrollTrigger.create({
+          trigger: list,
+          start: `top ${LINE}`,
+          endTrigger: nodes[nodes.length - 1],
+          end: `center ${LINE}`,
+          onUpdate: (self) => {
+            if (scene) setProgress(Math.round(self.progress * 100) / 100);
+            sync();
+          },
+          onRefresh: sync,
+        });
+
+        setScrubbing(true);
+        sync();
+        return () => {
+          setScrubbing(false);
+          setReached(total);
+        };
+      });
+    },
+    [scene, total],
+  );
+
+  return (
+    <div ref={scopeRef} className={cn("grid gap-12 lg:grid-cols-12 lg:gap-8", className)}>
+      <div className={poster ? "lg:col-span-6 xl:col-span-5" : "lg:col-span-8"}>{children}</div>
+
+      {poster && (
+        <div className="max-lg:order-first lg:col-span-6 lg:col-start-7">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md border border-line md:aspect-video lg:sticky lg:top-[calc(var(--header-h)_+_2rem)] lg:aspect-[4/5] lg:max-h-[calc(100svh_-_var(--header-h)_-_4rem)]">
+            {scene ? (
+              <div className="absolute inset-0">
+                <LazyScene load={scene} poster={poster} label={sceneLabel} progress={progress} className="h-full w-full" />
+              </div>
+            ) : (
+              <MediaImage
+                asset={poster}
+                fill
+                sizes="(min-width: 1280px) 39rem, (min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+            )}
+
+            {corners.map((corner) => (
+              <span key={corner} aria-hidden className={cn("pointer-events-none absolute size-4 border-highlight", corner)} />
+            ))}
+
+            {scrubbing && (
+              <div
+                aria-hidden
+                data-scheme="dark"
+                className="absolute inset-x-0 top-0 flex items-start justify-between gap-6 bg-linear-to-b from-navy-950/60 to-transparent p-8 pb-16 transition-opacity duration-250 starting:opacity-0"
+              >
+                <span className="type-label text-highlight tabular-nums">
+                  {stepLabel} {pad(current)} / {pad(total)}
+                </span>
+                <span className="type-label text-right">{stepTitles[current - 1]}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
