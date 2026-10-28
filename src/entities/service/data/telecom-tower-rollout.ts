@@ -7,7 +7,9 @@ import type { Service } from "../model/types";
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.2).
 // It describes the work in general terms only: no clients, operators, site counts, brands,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
-// must verify before launch. Every image is a placeholder; its alt text is the shot to supply.
+// must verify before launch. Hero and showcase are licensed stock photography, illustrative only
+// and never presented as FMECC work (planning/MEDIA_PLAN.md); gallery images are placeholders
+// whose alt text is the shot to supply.
 export const telecomTowerRollout: Service = {
   slug: "telecom-tower-rollout",
   index: 2,
@@ -18,8 +20,18 @@ export const telecomTowerRollout: Service = {
   summary:
     "FMECC builds greenfield and rooftop telecom sites for network operators, tower companies and rollout contractors: surveys, civil foundations, tower erection, power and earthing, with installation support through to site acceptance.",
   icon: RadioTower,
-  hero: placeholderImage("Telecom tower against a clear sky, wide view from the base", "16:9"),
-  showcaseMedia: placeholderImage("Lattice telecom tower under erection, vertical view", "4:5"),
+  hero: {
+    src: "/images/services/telecom-tower-rollout/hero-tower-from-base.webp",
+    width: 1920,
+    height: 1080,
+    alt: "Lattice telecom tower with panel antennas and a microwave dish, seen from the base against a blue sky",
+  },
+  showcaseMedia: {
+    src: "/images/services/telecom-tower-rollout/showcase-crew-on-tower.webp",
+    width: 1600,
+    height: 2000,
+    alt: "Two technicians in helmets and harnesses working among the antennas of a lattice telecom tower",
+  },
   audiences: [
     "Mobile network operators",
     "Tower companies and infrastructure owners",

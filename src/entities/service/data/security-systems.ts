@@ -7,7 +7,9 @@ import type { Service } from "../model/types";
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.3).
 // It describes the work in general terms only: no clients, equipment brands, response times,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
-// must verify before launch. Every image is a placeholder; its alt text is the shot to supply.
+// must verify before launch. Hero and showcase are licensed stock photography, illustrative only
+// and never presented as FMECC work (planning/MEDIA_PLAN.md); gallery images are placeholders
+// whose alt text is the shot to supply.
 export const securitySystems: Service = {
   slug: "security-systems",
   index: 3,
@@ -18,8 +20,18 @@ export const securitySystems: Service = {
   summary:
     "FMECC designs, installs and maintains integrated security systems for residential, commercial and institutional sites: CCTV, access control, intrusion detection and intercoms, with preventive maintenance that keeps them working after handover.",
   icon: Cctv,
-  hero: placeholderImage("Security control room with live camera views, cool night-time grade", "16:9"),
-  showcaseMedia: placeholderImage("Security camera mounted on a building facade at dusk", "4:5"),
+  hero: {
+    src: "/images/services/security-systems/hero-cameras-on-pole-at-night.webp",
+    width: 1920,
+    height: 1080,
+    alt: "Two CCTV cameras mounted on a pole against a dark night sky",
+  },
+  showcaseMedia: {
+    src: "/images/services/security-systems/showcase-camera-outside-glass-building.webp",
+    width: 1600,
+    height: 2000,
+    alt: "CCTV camera on a pole in front of a dark glass office building",
+  },
   audiences: [
     "Facility and property managers",
     "Residential compounds and villa communities",

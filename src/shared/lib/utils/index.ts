@@ -1,2 +1,2 @@
 export { cn } from "./cn";
-export { getDeviceTier, hasWebGL, type DeviceTier } from "./device";
+export { getDeviceTier, hasWebGL, savesData, type DeviceTier } from "./device";

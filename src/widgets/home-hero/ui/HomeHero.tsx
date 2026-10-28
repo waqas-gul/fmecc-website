@@ -39,7 +39,9 @@ export function HomeHero() {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <div data-animate="hero-media" className="absolute inset-0">
           <div className="absolute inset-0 transition-transform duration-1600 ease-out-expo starting:scale-108 motion-reduce:transition-none">
-            <VideoBackground video={heroVideo} overlay="dark" preload />
+            {/* The 16:9 poster covers a full-height hero, so on portrait screens it renders 16/9 of the viewport height wide.
+                Below 1024 px the poster stands alone: the video's first frame would otherwise be the mobile LCP. */}
+            <VideoBackground video={heroVideo} overlay="dark" preload sizes="max(100vw, 177.78vh)" desktopOnly />
           </div>
         </div>
         <ColumnGuides />

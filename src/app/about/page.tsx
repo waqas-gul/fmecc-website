@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 
 import { routes, site } from "@/shared/config";
-import { placeholderImage } from "@/shared/lib/media";
 import { buildMetadata } from "@/shared/lib/seo";
+import type { ImageAsset } from "@/shared/types/media";
 import { LinkButton } from "@/shared/ui";
 import { company } from "@/entities/company";
 import { services } from "@/entities/service";
@@ -13,8 +13,13 @@ import { ProcessSection } from "@/widgets/process-section";
 import { showcaseScenes } from "@/widgets/service-showcase";
 import { ValuesSection } from "@/widgets/values-section";
 
-// Replaced by FMECC site photography (planning/DESIGN.md §12.4); flagged `placeholder: true`.
-const heroMedia = placeholderImage("Construction site photography", "16:9");
+// Licensed stock photography, illustrative only (planning/MEDIA_PLAN.md); not an FMECC project.
+const heroMedia: ImageAsset = {
+  src: "/images/about/about-hero-steel-frame.webp",
+  width: 1920,
+  height: 1080,
+  alt: "Structural steel frame of a building under construction against a pale sky",
+};
 
 export const metadata = buildMetadata({
   title: "About us",

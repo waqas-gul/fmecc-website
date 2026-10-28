@@ -277,7 +277,7 @@ Originals live in `media-src/<section>/<name>.jpg`; `npm run images` writes `pub
 
 ### 12.3 Video specs
 - Hero loop 8–12 s, 1920 × 1080, 24–30 fps, no audio track, H.264 MP4 (≤ 3 MB) plus VP9 WebM (≤ 2 MB); poster = first frame as WebP.
-- Attributes: `autoPlay muted loop playsInline preload="none"`; source attached only when in view and motion is allowed; paused when off-screen.
+- Attributes: `autoPlay muted loop playsInline preload="none"`; source attached only when in view, motion is allowed and Save-Data is off; paused when off-screen. The Home hero plays from 1024 px only: narrower screens get the poster alone, with no video request.
 - Project videos: ≤ 60 s, user-initiated playback with native controls, poster required.
 - Never autoplay with sound; never rely on video to convey text.
 

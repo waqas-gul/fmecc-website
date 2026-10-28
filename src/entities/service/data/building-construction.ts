@@ -7,7 +7,9 @@ import type { Service } from "../model/types";
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.1).
 // It describes the work in general terms only: no clients, projects, figures, brands,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
-// must verify before launch. Every image is a placeholder; its alt text is the shot to supply.
+// must verify before launch. Hero and showcase are licensed stock photography, illustrative only
+// and never presented as FMECC work (planning/MEDIA_PLAN.md); gallery images are placeholders
+// whose alt text is the shot to supply.
 export const buildingConstruction: Service = {
   slug: "building-construction",
   index: 1,
@@ -19,8 +21,18 @@ export const buildingConstruction: Service = {
   summary:
     "FMECC takes building projects from foundations to handover as a single contractor: civil and structural works, coordinated MEP installation, and finishing and fit-out, with one site team responsible for programme, safety and quality.",
   icon: Building,
-  hero: placeholderImage("Low-horizon view of a building under construction against the sky", "16:9"),
-  showcaseMedia: placeholderImage("Reinforced-concrete frame of a building under construction", "4:5"),
+  hero: {
+    src: "/images/services/building-construction/hero-concrete-frame-low-angle.webp",
+    width: 1920,
+    height: 1080,
+    alt: "Concrete frame of a multi-storey building under construction, seen from below against a clear sky",
+  },
+  showcaseMedia: {
+    src: "/images/services/building-construction/showcase-concrete-frame-portrait.webp",
+    width: 1600,
+    height: 2000,
+    alt: "Reinforced-concrete frame of a building under construction against a cloudy sky",
+  },
   audiences: [
     "Property developers and investors",
     "Private owners building villas and residential blocks",

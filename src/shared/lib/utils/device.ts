@@ -19,6 +19,11 @@ export function getDeviceTier(): DeviceTier {
   return cores >= 8 && memory >= 8 ? "high" : "mid";
 }
 
+/** True when the visitor has asked to save data (Save-Data). Call only in the browser. */
+export function savesData(): boolean {
+  return (navigator as Navigator & NavigatorHints).connection?.saveData === true;
+}
+
 /** True when the browser can create a WebGL context. Call only in the browser. */
 export function hasWebGL(): boolean {
   try {

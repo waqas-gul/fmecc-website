@@ -1,4 +1,3 @@
-import { placeholderImage } from "@/shared/lib/media";
 import type { VideoAsset } from "@/shared/types/media";
 
 // TODO(content): draft hero copy for FMECC to confirm. It names the four services only and makes
@@ -14,11 +13,16 @@ export const heroContent = {
   scrollCue: "Scroll",
 } as const;
 
-// FMECC has not supplied the hero loop yet (planning/DESIGN.md §12.3). While `placeholder` is set,
-// VideoBackground renders the poster panel only and requests no video file.
+// Licensed stock footage, illustrative only and not an FMECC project (planning/MEDIA_PLAN.md):
+// an 11.9 s forward-and-back loop (DESIGN.md §12.3). The poster is the loop's first frame, so the
+// video fades in over an identical picture.
 export const heroVideo: VideoAsset = {
   mp4: "/videos/home-hero.mp4",
   webm: "/videos/home-hero.webm",
-  poster: placeholderImage("FMECC construction and telecom site footage", "16:9"),
-  placeholder: true,
+  poster: {
+    src: "/images/home/home-hero-poster.webp",
+    width: 1920,
+    height: 1080,
+    alt: "Building under construction at night, with a lit tower crane against a dark blue sky",
+  },
 };
