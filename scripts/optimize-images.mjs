@@ -9,6 +9,8 @@
 //      → public/images/brand/logo-96.webp (header and footer: 2× the largest 48 px display height)
 //      → src/app/icon.png (192 px), src/app/apple-icon.png (180 px), src/app/opengraph-image.png (+ .alt.txt)
 //      → src/shared/config/brand-assets.json, read by the BrandLogo component.
+//
+// `npm run images` runs both steps; `npm run images -- --media` or `-- --brand` runs one of them.
 
 import { existsSync } from "node:fs";
 import { mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
@@ -140,5 +142,7 @@ async function buildBrandAssets() {
   console.log(`Brand: logo, icons and Open Graph image generated (logo ${logo.width}×${logo.height}).`);
 }
 
-await optimizeMedia();
-await buildBrandAssets();
+const steps = process.argv.slice(2);
+const runAll = !steps.includes("--media") && !steps.includes("--brand");
+if (runAll || steps.includes("--media")) await optimizeMedia();
+if (runAll || steps.includes("--brand")) await buildBrandAssets();
