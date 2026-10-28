@@ -107,7 +107,7 @@ Content requirements per service. Scope items are **candidate** items for FMECC 
 ## 6. Project portfolio requirements
 
 - Data model: `Project` in ARCHITECTURE.md §7 (slug, title, services, location, year, client, status, summary, scope, hero, gallery, video, featured).
-- Listing page: responsive grid (1 / 2 / 3 columns), filter chips by service, "All" default, filter state mirrored in `?service=` so links from service pages preselect it. Empty state when a filter has no projects.
+- Listing page: responsive grid (1 / 2 / 3 columns), filters by service, "All" default, filter state mirrored in `?service=` so links from service pages preselect it. Empty state when a filter has no projects. While the illustrative concepts stand in, the same filter browses them as full-width editorial features under a "Selected concepts" hero (DESIGN.md §9.3), each labelled "Illustrative concept".
 - Detail page: hero media, facts sidebar (service, location, year, client, status — only fields that exist), narrative paragraphs, scope list, gallery with lightbox-free grid (keep simple), related projects by service, CTA band.
 - Media per project: hero ≥ 1920 × 1080, 4–8 gallery images, optional video. Alt text required for every image.
 - Placeholder policy: during development, entries carry `placeholder: true`, render a visible "Sample" badge and never ship. Production acceptance requires zero placeholder entries; if no real projects are available at launch, the listing renders a "Portfolio in progress" state and the Home featured-projects section is hidden.

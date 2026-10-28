@@ -4,24 +4,52 @@ import { useLayoutEffect, useRef } from "react";
 
 import { mediaQueries, motionTokens } from "@/shared/lib/animation";
 
-const easing = `cubic-bezier(${motionTokens.bezier.outExpo.join(", ")})`;
+const bezier = (curve: readonly number[]) => `cubic-bezier(${curve.join(", ")})`;
+const easing = bezier(motionTokens.bezier.outExpo);
+const wipeEasing = bezier(motionTokens.bezier.inOutQuart);
 
 /**
  * Reveal catalogue (planning/DESIGN.md §10.4). `fade-up` rises and fades in; `media-scale` does
  * the same for a media frame while every image inside settles from 1.08 to 1 over the cinematic
  * duration; `rule-draw` draws a divider from its transform origin (set `origin-left` on it).
+ * `mask` slides the scope's children up from below its bottom edge, so give the scope
+ * `overflow-hidden` (oversized numbers, single lines). `media-mask` wipes a media frame open: its
+ * cover, a `[data-reveal-cover]` layer in the surface colour resting at opacity 0, lifts off from
+ * the bottom edge up while every image settles from 1.12 to 1; the frame itself does not move.
  */
-export type RevealVariant = "fade-up" | "media-scale" | "rule-draw";
+export type RevealVariant = "fade-up" | "media-scale" | "media-mask" | "mask" | "rule-draw";
 
-type Step = { target: Element; keyframes: Keyframe[]; duration: number; delay: number };
+type Step = { target: Element; keyframes: Keyframe[]; duration: number; delay: number; easing?: string };
 
 function steps(targets: Element[], variant: RevealVariant, y: number, delay: number, stagger: number): Step[] {
   const reveal = motionTokens.duration.reveal * 1000;
   const cinematic = motionTokens.duration.cinematic * 1000;
-  return targets.flatMap((target, index) => {
+  return targets.flatMap((target, index): Step[] => {
     const start = (delay + index * stagger) * 1000;
     if (variant === "rule-draw") {
       return [{ target, keyframes: [{ transform: "scaleX(0)" }, { transform: "none" }], duration: cinematic, delay: start }];
+    }
+    if (variant === "mask") {
+      return [{ target, keyframes: [{ transform: "translateY(101%)" }, { transform: "none" }], duration: cinematic, delay: start }];
+    }
+    if (variant === "media-mask") {
+      const wipe = Array.from(target.querySelectorAll("[data-reveal-cover]"), (cover): Step => ({
+        target: cover,
+        keyframes: [
+          { opacity: 1, transform: "scaleY(1)" },
+          { opacity: 1, transform: "scaleY(0)" },
+        ],
+        duration: cinematic,
+        delay: start,
+        easing: wipeEasing,
+      }));
+      const settle = Array.from(target.querySelectorAll("img"), (image): Step => ({
+        target: image,
+        keyframes: [{ scale: "1.12" }, { scale: "1" }],
+        duration: cinematic + 400,
+        delay: start,
+      }));
+      return [...wipe, ...settle];
     }
     const rise: Step = {
       target,
@@ -83,9 +111,10 @@ export function Reveal({
     if (scope.getBoundingClientRect().top < window.innerHeight) return;
 
     // Paused at the start with backwards fill: each target holds the first frame until played.
-    const targets = stagger ? Array.from(scope.children) : [scope];
-    const animations = steps(targets, variant, y, delay, stagger ?? 0).map(({ target, keyframes, duration, delay: wait }) => {
-      const animation = target.animate(keyframes, { duration, delay: wait, easing, fill: "both" });
+    const targets = stagger || variant === "mask" ? Array.from(scope.children) : [scope];
+    const animations = steps(targets, variant, y, delay, stagger ?? 0).map((step) => {
+      const { target, keyframes, duration, delay: wait } = step;
+      const animation = target.animate(keyframes, { duration, delay: wait, easing: step.easing ?? easing, fill: "both" });
       animation.pause();
       // A one-time reveal drops its effect when done: the element rests on its own styles again.
       if (once) animation.onfinish = () => animation.cancel();

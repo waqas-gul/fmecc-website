@@ -67,11 +67,12 @@ src/
   widgets/
     site-header/  site-footer/  page-hero/  cta-band/
     home-hero/  home-intro/  services-showcase/  process-section/  featured-projects/  values-section/
+    portfolio-hero/            PortfolioHero (Projects opening while concepts stand in: "Selected concepts")
     concept-comparison/        ConceptComparison + ComparisonSlider (Home: concept drawing vs construction stage, illustrative)
     quote-shortcut/            QuoteShortcut (floating "Get a quote", rendered by the root layout)
     service-detail/            ServiceOverview, ServiceScope, ServiceProcess, DeliveryProcess, ServicePanels, ServiceFaq, RelatedProjects
     service-showcase/          ServiceShowcase + scenes/ (TowerScene, BollardScene, BuildingScene, CoverageDiagram)
-    project-detail/            ProjectFacts, ProjectNarrative, ProjectGallery
+    project-detail/            ProjectFacts, ProjectNarrative, ProjectGallery, CaseStudyHero, CaseStudyBrief, ProjectIndex, NextProject
     about-sections/            AboutStory, AboutServices, AboutStandards, AboutTeam (data-gated), AboutRegistrations (data-gated)
     contact-panel/             ContactPanel (channels + location + hours)
   features/
@@ -164,8 +165,8 @@ export function Eyebrow(props: { index?: number; className?: string; children: R
 export function Card(props: { as?: 'article' | 'div' | 'li'; href?: Route; interactive?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element;
 export function Badge(props: { tone?: 'neutral' | 'accent' | 'brand'; children: React.ReactNode }): React.JSX.Element;
 export function Accordion(props: { items: { id: string; title: string; content: React.ReactNode }[]; defaultOpenId?: string; className?: string }): React.JSX.Element;   // server; native <details>/<summary> with an h3 per question, works without JS, CSS height animation where supported
-export type RevealVariant = 'fade-up' | 'media-scale' | 'rule-draw';
-export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; variant?: RevealVariant; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; IntersectionObserver + Web Animations API (no GSAP); reduced-motion aware; focus inside finishes it. media-scale also settles every img inside from scale 1.08 (the `scale` property, so hover zoom and parallax transforms still apply); rule-draw scales X from the element's transform origin
+export type RevealVariant = 'fade-up' | 'media-scale' | 'media-mask' | 'mask' | 'rule-draw';
+export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; variant?: RevealVariant; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; IntersectionObserver + Web Animations API (no GSAP); reduced-motion aware; focus inside finishes it. media-scale also settles every img inside from scale 1.08 (the `scale` property, so hover zoom and parallax transforms still apply); rule-draw scales X from the element's transform origin; mask slides the scope's children up out of the scope (give it overflow-hidden); media-mask lifts the frame's `[data-reveal-cover]` layer (surface colour, resting at opacity 0, origin top) off with scaleY 1 → 0 while every img inside settles from scale 1.12
 // SectionHeader reveals its eyebrow, title and lede in sequence (Reveal stagger) when below the fold.
 export function MediaImage(props: Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & { asset: ImageAsset; sizes: string }): React.JSX.Element;
 export function VideoBackground(props: { video: VideoAsset; overlay?: 'none' | 'dark' | 'brand'; preload?: boolean; sizes?: string; desktopOnly?: boolean; className?: string }): React.JSX.Element;  // client; poster fallback, lazy, pause control; `preload` only when the poster is the page's LCP image (heroes); `sizes` (default '100vw') is the poster's rendered width, wider than the box when a 16:9 poster covers a taller box; `desktopOnly` leaves the poster alone below 1024 px (no video element, no requests, no control)
@@ -180,7 +181,7 @@ export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
 export function Checkbox(props: React.InputHTMLAttributes<HTMLInputElement> & { label: React.ReactNode; invalid?: boolean }): React.JSX.Element;
 // Added in WS-0 (header, footer and section chrome need them):
 export function BrandLogo(props: { size?: 'sm' | 'md' | 'lg'; className?: string }): React.JSX.Element;  // transparent logo as supplied, or the marked text fallback
-export function ColumnGuides(props: { className?: string }): React.JSX.Element;                                          // decorative 12-column guides
+export function ColumnGuides(props: { size?: ContainerSize; className?: string }): React.JSX.Element;                    // decorative 12-column guides on the columns of a content (default), wide or full container; Section passes its own container size
 // Added in WS-6 (one tile instead of eight copies across six widgets):
 export function IconTile(props: { icon: LucideIcon; className?: string }): React.JSX.Element;                          // 40 px tile, 20 px cyan glyph, aria-hidden
 ```
@@ -188,7 +189,7 @@ export function IconTile(props: { icon: LucideIcon; className?: string }): React
 ```ts
 export function LineReveal(props: { as?: 'h2' | 'h3'; className?: string; children: React.ReactNode }): React.JSX.Element; // client; SplitText line mask reveal below the fold
 ```
-CSS utilities in `src/shared/styles/base.css` (scroll-driven, no JavaScript; finished state where unsupported or with reduced motion): `parallax-frame` + `parallax-media` (image drifts ±4 % inside a clipped frame), `rule-scroll-x` / `rule-scroll-y` (progress rule fills as it enters). Never combine `parallax-media` with a GSAP transform on the same image (CSS animations override inline styles).
+CSS utilities in `src/shared/styles/base.css` (scroll-driven, no JavaScript; finished state where unsupported or with reduced motion): `parallax-frame` + `parallax-media` (image drifts ±4 % inside a clipped frame), `rule-scroll-x` / `rule-scroll-y` (progress rule fills as it enters), `parallax-drift` (oversized type drifts ±20 % of its height while crossing the viewport), `scroll-exit` (sinks 12 % and dims to 0.35 while leaving at the top). The last two animate the individual `translate` property, so they compose with transforms. Never combine `parallax-media` with a GSAP transform on the same image (CSS animations override inline styles).
 `className` on shared components is for layout. To hide one responsively use variant utilities (`max-lg:hidden`), never base display classes such as `hidden`, which lose to the component's own `inline-flex`. Inside `FormField`, controls receive `id`, `aria-describedby`, `aria-invalid` and `required` automatically.
 
 `src/shared/lib` public API:
@@ -294,7 +295,8 @@ export function getConcept(slug: string): ProjectConcept | undefined;
 export function conceptNumber(slug: string): number;
 export const conceptNotice: string;                                   // shown wherever concepts appear
 export function conceptMediaTransition(slug: string): string;         // view-transition name shared by a card's media and the concept page hero
-export function ConceptCard(props: { concept: ProjectConcept; variant?: 'default' | 'compact' | 'featured'; className?: string }): React.JSX.Element;  // always labelled "Illustrative concept"
+export function ConceptCard(props: { concept: ProjectConcept; variant?: 'default' | 'compact' | 'featured'; className?: string }): React.JSX.Element;  // always labelled "Illustrative concept" (Home rail)
+export function ConceptFeature(props: { concept: ProjectConcept; morph?: boolean; className?: string }): React.JSX.Element;  // editorial feature for /projects/: composition by the concept's position (wide, tall right, tall left, panorama); always labelled; `morph` (default true) names the frame for the hero morph, off in markup swapped out on hydration
 
 // src/entities/company
 export interface CompanyContent {
@@ -337,12 +339,17 @@ export function ServiceFaq(props: { service: Service }): React.JSX.Element;
 export function RelatedProjects(props: { service: Service; projects: Project[] }): React.JSX.Element;
 export function ProjectFacts(props: { project: Project }): React.JSX.Element;
 export function ProjectNarrative(props: { project: Project }): React.JSX.Element;
-export function ProjectGallery(props: { images: ImageAsset[]; title?: string; lede?: string; label?: string }): React.JSX.Element;  // title defaults to 'Project gallery'; label is printed on every image (concepts: "Illustrative concept")
+export function ProjectGallery(props: { images: ImageAsset[]; title?: string; lede?: string; label?: string }): React.JSX.Element;  // title defaults to 'Project gallery'; label is printed on every image (concepts: "Illustrative concept"); sticky header beside two staggered columns
+export function PortfolioHero(props: { eyebrow: string; title: readonly string[]; lede: string; notice?: string; media: ImageAsset; caption?: string; facts?: readonly { label: string; value: string }[]; breadcrumbs: { label: string; href?: Route }[]; scrollTo?: { href: `#${string}`; label: string; description: string } }): React.JSX.Element;  // /projects/ while concepts stand in; owns the h1; media is the LCP image (4:5 render on the dark surface)
+export function CaseStudyHero(props: { meta?: string; category?: string; status?: string; title: string; lede?: string; media: ImageAsset; mediaTransition?: string; label?: string; caption?: string; breadcrumbs: { label: string; href?: Route }[]; actions?: React.ReactNode }): React.JSX.Element;  // detail opening with the full-width hero image; mediaTransition as in PageHero
+export function CaseStudyBrief(props: { overviewTitle?: string; paragraphs: string[]; facts: readonly { label: string; value: string; href?: Route }[]; notice?: string; scopeTitle?: string; scope: string[] }): React.JSX.Element;  // Section id "overview": facts beside the overview, then the numbered scope
+export function ProjectIndex(props: { eyebrow: string; title: string; items: readonly { key: string; number: string; title: string; meta?: string; href: Route }[]; all?: { label: string; href: Route } }): React.JSX.Element;  // ruled rows, one link each; nothing without items
+export function NextProject(props: { heading: string; position?: string; category?: string; title: string; href: Route; media: ImageAsset; mediaTransition?: string }): React.JSX.Element;  // full-width panel link; its frame carries the next entry's mediaTransition
 export function ContactPanel(): React.JSX.Element;
 // features
 export function QuoteRequestForm(props: { defaultService?: ServiceSlug; id?: string }): React.JSX.Element;   // client; reads ?service= inside Suspense
 export function ContactChannels(props: { layout: 'inline' | 'stack' | 'grid'; className?: string }): React.JSX.Element;   // server; omits null channels
-export function ProjectFilter(props: { projects: Project[]; concepts?: readonly ProjectConcept[] }): React.JSX.Element;  // client; chips + grid + URL sync; real projects win, else the concepts, else "portfolio in progress"
+export function ProjectFilter(props: { projects: Project[]; concepts?: readonly ProjectConcept[] }): React.JSX.Element;  // client; filter tabs + results + URL sync; real projects (card grid) win, else the concepts (ConceptFeature list), else "portfolio in progress"; the filter bar is hidden without JavaScript (`noscript:`)
 ```
 
 ## 9. Routing approach
@@ -352,7 +359,7 @@ export function ProjectFilter(props: { projects: Project[]; concepts?: readonly 
 - Export fails when a dynamic segment generates no params, so while `projects` is empty the detail page lives in the private folder `projects/_detail/` (linted and type-checked, not routed). Adding the first verified project requires `git mv src/app/projects/_detail "src/app/projects/[slug]"`; the `/projects/` build check (`projects/_lib/check-portfolio.ts`) stops the build until that is done.
 - `typedRoutes: true`: all `href`s are typed; `routes.*` helpers are the only place route strings are built.
 - Metadata: `app/layout.tsx` sets `metadataBase`, default title/template, Open Graph defaults; pages call `buildMetadata()`.
-- Route transitions: named React 19.3 `<ViewTransition share="morph" default="none">` pairs only (concept card media ↔ concept page hero, `conceptMediaTransition(slug)`); other navigations swap instantly. CSS in `base.css` styles the morph and turns it off with reduced motion. Scroll resets to top on navigation (default behaviour).
+- Route transitions: named React 19.3 `<ViewTransition share="morph" default="none">` pairs only (concept card or feature media, and the next-concept panel, ↔ concept page hero, `conceptMediaTransition(slug)`); other navigations swap instantly. The project filter's results sit in a keyed `<ViewTransition>` with `filter-exit` / `filter-enter` classes and the pressed tab's indicator is a shared `filter-indicator`; Next applies `?service=` changes inside a transition, so these animate filter changes. Both switch on with the first click, and the Suspense fallback names no frames, so hydration never starts a view transition. CSS in `base.css` styles the morph and turns it off with reduced motion. Scroll resets to top on navigation (default behaviour).
 - Query-driven UI (`?service=`) is client-only behind `<Suspense>`; the server-rendered default state must be correct without the query.
 - No route handlers, server actions, middleware/proxy, redirects, rewrites or headers (unsupported in export mode).
 

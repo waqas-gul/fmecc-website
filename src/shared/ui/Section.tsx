@@ -40,7 +40,7 @@ export function Section({
       data-scheme={scheme}
       className={cn("relative bg-surface text-ink", spacingClasses[spacing], className)}
     >
-      {guides && <ColumnGuides />}
+      {guides && <ColumnGuides size={container || "content"} />}
       {container ? (
         <Container size={container} className="relative">
           {children}

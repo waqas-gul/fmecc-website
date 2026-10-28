@@ -1,35 +1,41 @@
+import { ViewTransition } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { routes, type ServiceSlug } from "@/shared/config";
 import { cn } from "@/shared/lib/utils";
 import { Button, LinkButton, Reveal, VisuallyHidden } from "@/shared/ui";
-import { ConceptCard } from "@/entities/concept";
+import { ConceptFeature } from "@/entities/concept";
 import { ProjectCard } from "@/entities/project";
 
 import { portfolioServices, type Portfolio, type ServiceOption } from "../lib/filter";
 
-const HEADING_ID = "project-filter-heading";
+const LABEL_ID = "project-filter-label";
 const RESULTS_ID = "project-filter-results";
 
 const nouns = { projects: ["project", "projects"], concepts: ["concept", "concepts"] } as const;
+const headings = { projects: "Projects", concepts: "Illustrative concepts" } as const;
 
-// Three columns of project cards; the larger concept cards sit two to a row.
+// Project cards sit three to a row; concepts are full-width editorial features, one after another.
 const layouts = {
-  projects: { columns: 3, grid: "grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8" },
-  concepts: { columns: 2, grid: "grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:gap-x-8 lg:gap-y-20" },
+  projects: "grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8",
+  concepts: "flex flex-col gap-y-28 sm:gap-y-36 lg:gap-y-48",
 } as const;
 
+const pad = (value: number) => String(value).padStart(2, "0");
+
 /**
- * Chips, result count and grid. Hook-free on purpose: the server renders it as the Suspense
- * fallback (the "All" view, chips inert until hydration) and the client island renders it with
- * state, so both produce the same markup. Cards first reveal row by row as they scroll in; after a
- * filter change the new set rises in sequence.
+ * Filter bar, result count and results. Hook-free on purpose: the server renders it as the Suspense
+ * fallback (the "All" view, filters inert until hydration) and the client island renders it with
+ * state, so both produce the same markup. Without JavaScript the filter bar is hidden (it could not
+ * work) and every entry shows. Entries reveal as they scroll in. With `transitions`, a filter change
+ * is a React view transition: the previous set lifts away, the new set rises in and the indicator
+ * slides to the pressed filter; it stays off until the visitor first filters, so hydration never animates.
  */
 export function ProjectFilterView({
   portfolio,
   options,
   active,
-  animate = false,
+  transitions = false,
   onSelect,
   onShowAll,
   allChipRef,
@@ -37,26 +43,29 @@ export function ProjectFilterView({
   portfolio: Portfolio;
   options: ServiceOption[];
   active: ServiceSlug | null;
-  /** Replays the entrance animation; only after the visitor changes the filter. */
-  animate?: boolean;
+  transitions?: boolean;
   onSelect?: (service: ServiceSlug | null) => void;
   onShowAll?: () => void;
   allChipRef?: React.Ref<HTMLButtonElement>;
 }) {
   const [one, many] = nouns[portfolio.kind];
-  const layout = layouts[portfolio.kind];
   const lists = portfolioServices(portfolio);
   const entries =
     portfolio.kind === "projects"
       ? portfolio.items.map((project, index) => ({
           key: project.slug,
           services: lists[index],
-          card: <ProjectCard project={project} className="w-full" />,
+          card: (
+            <Reveal variant="media-scale" delay={(index % 3) * 0.08} className="flex w-full">
+              <ProjectCard project={project} className="w-full" />
+            </Reveal>
+          ),
         }))
       : portfolio.items.map((concept, index) => ({
           key: concept.slug,
           services: lists[index],
-          card: <ConceptCard concept={concept} className="w-full" />,
+          // Only the client island names the frames for the morph (the fallback is swapped out on hydration).
+          card: <ConceptFeature concept={concept} morph={Boolean(onSelect)} />,
         }));
 
   const activeOption = options.find((option) => option.slug === active);
@@ -67,86 +76,87 @@ export function ProjectFilterView({
     : `Showing ${total === 1 ? `1 ${one}` : `all ${total} ${many}`}`;
 
   return (
-    <div className="flex flex-col gap-10 lg:gap-14">
-      <div className="flex flex-col gap-6 border-b border-line pb-8 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
-        <div className="flex flex-col gap-5">
-          <h2 id={HEADING_ID} className="type-label flex items-center gap-3 text-ink-muted">
+    <div className="flex flex-col gap-16 lg:gap-24">
+      <h2 className="sr-only">{headings[portfolio.kind]}</h2>
+      <div className="noscript:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-x-10 gap-y-3">
+          <p id={LABEL_ID} className="type-label flex items-center gap-3 text-ink-muted">
             <span aria-hidden className="h-px w-6 shrink-0 bg-highlight" />
             Filter by service
-          </h2>
-          <div role="group" aria-labelledby={HEADING_ID} className="flex flex-wrap gap-2">
-            <FilterChip
-              ref={allChipRef}
-              label="All"
-              count={total}
-              pressed={active === null}
-              onClick={onSelect && (() => onSelect(null))}
-            />
-            {options.map((option) => (
-              <FilterChip
-                key={option.slug}
-                label={option.label}
-                count={option.count}
-                pressed={active === option.slug}
-                onClick={onSelect && (() => onSelect(option.slug))}
-              />
-            ))}
-          </div>
+          </p>
+          <p role="status" className="type-label text-ink-subtle tabular-nums">
+            {status}
+          </p>
         </div>
-        <p role="status" className="shrink-0 text-body-sm text-ink-muted tabular-nums">
-          {status}
-        </p>
+        <div role="group" aria-labelledby={LABEL_ID} className="mt-4 flex flex-wrap gap-x-8 border-b border-line lg:mt-6 lg:gap-x-10">
+          <FilterTab
+            ref={allChipRef}
+            label="All"
+            count={total}
+            pressed={active === null}
+            transitions={transitions}
+            onClick={onSelect && (() => onSelect(null))}
+          />
+          {options.map((option) => (
+            <FilterTab
+              key={option.slug}
+              label={option.label}
+              count={option.count}
+              pressed={active === option.slug}
+              transitions={transitions}
+              onClick={onSelect && (() => onSelect(option.slug))}
+            />
+          ))}
+        </div>
       </div>
 
       <div id={RESULTS_ID}>
         {visible.length > 0 ? (
-          <ul key={active ?? "all"} className={layout.grid}>
-            {visible.map((entry, index) =>
-              animate ? (
-                <li
-                  key={entry.key}
-                  className="flex motion-safe:animate-rise"
-                  style={{ animationDelay: `${Math.min(index, 5) * 60}ms` }}
-                >
+          <ViewTransition
+            key={active ?? "all"}
+            enter={transitions ? "filter-enter" : "none"}
+            exit={transitions ? "filter-exit" : "none"}
+            default="none"
+          >
+            <ul className={layouts[portfolio.kind]}>
+              {visible.map((entry) => (
+                <li key={entry.key} className="flex flex-col">
                   {entry.card}
                 </li>
-              ) : (
-                <Reveal
-                  as="li"
-                  key={entry.key}
-                  variant="media-scale"
-                  delay={(index % layout.columns) * 0.08}
-                  className="flex"
-                >
-                  {entry.card}
-                </Reveal>
-              ),
-            )}
-          </ul>
+              ))}
+            </ul>
+          </ViewTransition>
         ) : (
-          activeOption && (
-            <FilterEmptyState option={activeOption} noun={many} onShowAll={onShowAll} />
-          )
+          activeOption && <FilterEmptyState option={activeOption} noun={many} onShowAll={onShowAll} />
         )}
       </div>
     </div>
   );
 }
 
-/** Pill toggle; the pressed chip is the page's spectrum accent (planning/DESIGN.md §2.2, §2.4). */
-function FilterChip({
+/**
+ * Text toggle with its count. The pressed filter carries a 2 px spectrum rule, the page's one
+ * purple accent (planning/DESIGN.md §2.2, §2.4), which slides between filters on change; the others
+ * draw a hairline under the pointer.
+ */
+function FilterTab({
   ref,
   label,
   count,
   pressed,
+  transitions,
   onClick,
 }: {
   ref?: React.Ref<HTMLButtonElement>;
   label: string;
   count: number;
   pressed: boolean;
+  transitions: boolean;
   onClick?: () => void;
 }) {
+  // Sits on the group's bottom rule, like a tab underline.
+  const indicator = <span aria-hidden className="spectrum-fill absolute inset-x-0 -bottom-px h-0.5" />;
+
   return (
     <button
       ref={ref}
@@ -155,19 +165,26 @@ function FilterChip({
       aria-controls={RESULTS_ID}
       onClick={onClick}
       className={cn(
-        "group/chip inline-flex min-h-11 rounded-full p-px transition-colors duration-150 ease-standard",
-        pressed ? "spectrum-fill" : "bg-line-strong hover:bg-ink",
+        "group/tab type-label relative inline-flex min-h-11 items-center gap-2 transition-colors duration-150 ease-standard lg:min-h-14",
+        pressed ? "text-ink" : "text-ink-muted hover:text-ink",
       )}
     >
-      <span
-        className={cn(
-          "type-label inline-flex items-center gap-2.5 rounded-full px-4 transition-colors duration-150 ease-standard",
-          pressed ? "bg-surface-inverse text-ink-inverse" : "bg-surface text-ink-muted group-hover/chip:text-ink",
-        )}
-      >
-        {label}
-        <span className={cn("tabular-nums", pressed ? "text-ink-inverse/70" : "text-ink-subtle")}>{count}</span>
-      </span>
+      {label}
+      <span className={cn("tabular-nums", pressed ? "text-highlight" : "text-ink-subtle")}>{pad(count)}</span>
+      {pressed ? (
+        transitions ? (
+          <ViewTransition name="project-filter-indicator" share="filter-indicator" default="none">
+            {indicator}
+          </ViewTransition>
+        ) : (
+          indicator
+        )
+      ) : (
+        <span
+          aria-hidden
+          className="absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-current transition-[scale] duration-300 ease-out-expo group-hover/tab:scale-x-100"
+        />
+      )}
     </button>
   );
 }
