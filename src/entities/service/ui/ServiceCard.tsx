@@ -7,8 +7,10 @@ import { MediaImage } from "@/shared/ui";
 
 import type { Service } from "../model/types";
 
-// Minimal version created by WS-0 (planning/ARCHITECTURE.md §12); WS-2 owns and refines it.
-/** Whole card is one link; the service name is its accessible name (planning/DESIGN.md §7.2). */
+/**
+ * Whole card is one link; the service name is its accessible name (planning/DESIGN.md §7.2).
+ * Shows the one-line `tagline`: `summary` is a full positioning sentence for the service page.
+ */
 export function ServiceCard({
   service,
   variant = "default",
@@ -28,11 +30,13 @@ export function ServiceCard({
       )}
     >
       {variant === "default" ? (
-        <div className="overflow-hidden rounded-t-md">
+        // The frame sets the 4:3 crop so real images and placeholder panels match.
+        <div className="relative aspect-[4/3] overflow-hidden rounded-t-md">
           <MediaImage
-            asset={service.showcaseMedia.placeholder ? service.hero : service.showcaseMedia}
+            asset={service.hero}
+            fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="aspect-[4/3] w-full object-cover transition-transform duration-600 ease-out-expo motion-safe:group-hover:scale-[1.04]"
+            className="object-cover transition-transform duration-600 ease-out-expo motion-safe:group-hover:scale-[1.04]"
           />
         </div>
       ) : (
@@ -47,7 +51,7 @@ export function ServiceCard({
             {service.shortName}
           </Link>
         </h3>
-        <p className="line-clamp-2 text-body-sm text-ink-muted">{service.summary}</p>
+        <p className="line-clamp-3 text-body-sm text-ink-muted">{service.tagline}</p>
         <span aria-hidden className="type-label mt-auto inline-flex items-center gap-2 pt-3 text-accent-text">
           Explore
           <ArrowRight className="size-4 transition-transform duration-150 motion-safe:group-hover:translate-x-1" />
