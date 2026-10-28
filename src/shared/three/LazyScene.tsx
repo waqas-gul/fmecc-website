@@ -91,6 +91,20 @@ export function LazyScene({ load, poster, label, progress = 1, className }: Lazy
     };
   }, []);
 
+  // Development aid: a scene that keeps its poster gives no visible sign why, so say it once.
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production" || !requested || enabled) return;
+    const nav = navigator as Navigator & { deviceMemory?: number; connection?: { effectiveType?: string; saveData?: boolean } };
+    const reason = reducedMotion
+      ? "prefers-reduced-motion is on"
+      : tier === "low"
+        ? `the device tier is low (cores ${nav.hardwareConcurrency}, memory ${nav.deviceMemory ?? "?"} GB, connection ${nav.connection?.effectiveType ?? "?"}${nav.connection?.saveData ? ", Save-Data" : ""})`
+        : failed
+          ? "the scene failed to start (no WebGL, a load error or a lost context)"
+          : null;
+    if (reason) console.info(`[LazyScene] "${label.slice(0, 48)}…" shows its poster: ${reason}.`);
+  }, [requested, enabled, reducedMotion, tier, failed, label]);
+
   useEffect(() => {
     if (!enabled) return;
     const owner = Symbol("scene");
@@ -111,7 +125,8 @@ export function LazyScene({ load, poster, label, progress = 1, className }: Lazy
         const [scene] = await Promise.all([load(), import("./SceneCanvasImpl")]);
         if (!cancelled) setScene(() => scene.default);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (process.env.NODE_ENV !== "production") console.info("[LazyScene] scene load failed:", error);
         if (!cancelled) setFailed(true);
       });
 
