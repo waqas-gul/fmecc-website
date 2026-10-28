@@ -54,7 +54,7 @@ Frontend-only corporate website for Future Middle East Construction Company. Nex
 - Work only inside the directories your workstream owns (ARCHITECTURE.md §12). WS-0 owns config, `src/shared/**`, root layout and shared widgets.
 - Respect existing implementation: read a slice's `index.ts` before using it; do not refactor files you do not own.
 - If you must touch a foreign file, make the change additive and minimal and say so in your summary.
-- Branch `ws/<name>`; rebase on `main` daily; commit only when asked.
+- Branch `ws/<name>`; rebase on `master` (the integration branch) daily; commit only when asked.
 
 ## Before saying a task is done
 1. `npm run check` passes (lint, typecheck, static build).

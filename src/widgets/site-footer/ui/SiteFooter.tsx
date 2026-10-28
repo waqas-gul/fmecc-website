@@ -4,7 +4,8 @@ import { ArrowRight, ArrowUp } from "lucide-react";
 import { contactLinks, footerNav, routes, site } from "@/shared/config";
 import { BrandLogo, ColumnGuides, Container, LinkButton } from "@/shared/ui";
 
-const linkClasses = "rounded-sm text-body-sm text-ink-muted transition-colors duration-150 hover:text-ink";
+// 44 px tall rows: the links are touch targets (planning/DESIGN.md §5), so the rows carry the spacing.
+const linkClasses = "inline-flex min-h-11 items-center rounded-sm text-body-sm text-ink-muted transition-colors duration-150 hover:text-ink";
 
 /** Site footer on the brand scheme (planning/DESIGN.md §6.2). Contact details render only when supplied. */
 export function SiteFooter() {
@@ -32,7 +33,7 @@ export function SiteFooter() {
           {footerNav.map((group) => (
             <nav key={group.heading} aria-label={group.heading}>
               <h2 className="type-label text-ink-subtle">{group.heading}</h2>
-              <ul className="mt-5 flex flex-col gap-3">
+              <ul className="mt-2 flex flex-col">
                 {group.items.map((item) => (
                   <li key={item.href}>
                     <Link href={item.href} className={linkClasses}>
@@ -46,7 +47,7 @@ export function SiteFooter() {
 
           <div>
             <h2 className="type-label text-ink-subtle">Contact</h2>
-            <ul className="mt-5 flex flex-col gap-3">
+            <ul className="mt-2 flex flex-col">
               {contactLinks.map((link) => (
                 <li key={link.kind}>
                   <a href={link.href} className={linkClasses}>
@@ -55,8 +56,8 @@ export function SiteFooter() {
                   </a>
                 </li>
               ))}
-              {site.contact.address && <li className="text-body-sm text-ink-muted">{site.contact.address}</li>}
-              {site.contact.hours && <li className="text-body-sm text-ink-muted">{site.contact.hours}</li>}
+              {site.contact.address && <li className="py-3 text-body-sm text-ink-muted">{site.contact.address}</li>}
+              {site.contact.hours && <li className="py-3 text-body-sm text-ink-muted">{site.contact.hours}</li>}
               {contactLinks.length === 0 && (
                 <li>
                   <Link href={routes.contact} className={linkClasses}>

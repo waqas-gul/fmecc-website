@@ -52,7 +52,8 @@ export function Accordion({
                     onClick={() => toggle(item.id)}
                     className="group flex w-full items-start gap-5 py-6 text-left"
                   >
-                    <span className="type-label pt-1.5 text-highlight tabular-nums">
+                    {/* Decorative counter: the question alone names the button. */}
+                    <span aria-hidden className="type-label pt-1.5 text-highlight tabular-nums">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span className="flex-1 font-display text-heading-sm font-semibold text-ink transition-colors duration-150 group-hover:text-accent-text">

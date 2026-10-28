@@ -61,15 +61,15 @@ src/
     services/page.tsx
     services/[slug]/page.tsx   generateStaticParams from entities/service
     projects/page.tsx
-    projects/[slug]/page.tsx
+    projects/_detail/page.tsx  dormant /projects/[slug]: `git mv` to [slug]/ when the first verified project exists
     contact/page.tsx
   widgets/
     site-header/  site-footer/  page-hero/  cta-band/
     home-hero/  home-intro/  services-showcase/  process-section/  featured-projects/  values-section/
-    service-detail/            ServiceOverview, ServiceScope, ServiceProcess, ServiceFaq, RelatedProjects
+    service-detail/            ServiceOverview, ServiceScope, ServiceProcess, DeliveryProcess, ServicePanels, ServiceFaq, RelatedProjects
     service-showcase/          ServiceShowcase + scenes/ (TowerScene, BollardScene, BuildingScene, CoverageDiagram)
     project-detail/            ProjectFacts, ProjectNarrative, ProjectGallery
-    about-sections/            AboutStory, AboutTeam (data-gated), AboutRegistrations (data-gated)
+    about-sections/            AboutStory, AboutServices, AboutStandards, AboutTeam (data-gated), AboutRegistrations (data-gated)
     contact-panel/             ContactPanel (channels + location + hours)
   features/
     quote-request/  contact-channels/  project-filter/
@@ -92,6 +92,7 @@ src/
     types/     media.ts  scheme.ts
 scripts/
   optimize-images.mjs
+  fix-export-segments.mjs      post-build step of `npm run build` (§10)
 media-src/                     original photography (committed or LFS); not served
 public/
   images/brand/logo.png  images/<section>/<name>-<w>.webp  videos/
@@ -158,7 +159,7 @@ export function Badge(props: { tone?: 'neutral' | 'accent' | 'brand'; children: 
 export function Accordion(props: { items: { id: string; title: string; content: React.ReactNode }[]; defaultOpenId?: string; className?: string }): React.JSX.Element;   // client
 export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; reduced-motion aware
 export function MediaImage(props: Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & { asset: ImageAsset; sizes: string }): React.JSX.Element;
-export function VideoBackground(props: { video: VideoAsset; overlay?: 'none' | 'dark' | 'brand'; className?: string }): React.JSX.Element;  // client; poster fallback, lazy, pause control
+export function VideoBackground(props: { video: VideoAsset; overlay?: 'none' | 'dark' | 'brand'; preload?: boolean; className?: string }): React.JSX.Element;  // client; poster fallback, lazy, pause control; `preload` only when the poster is the page's LCP image (heroes)
 export function Breadcrumbs(props: { items: { label: string; href?: Route }[]; className?: string }): React.JSX.Element;  // renders BreadcrumbList JSON-LD
 export function SkipLink(): React.JSX.Element;
 export function VisuallyHidden(props: { as?: 'span' | 'div'; children: React.ReactNode }): React.JSX.Element;
@@ -291,14 +292,16 @@ export function PageHero(props: { eyebrow?: string; index?: number; title: strin
 export function CtaBand(props: { title?: string; description?: string; primary?: { label: string; href: Route }; scheme?: Scheme }): React.JSX.Element;   // defaults to the quote CTA + contact channels
 export function HomeHero(): React.JSX.Element;
 export function HomeIntro(): React.JSX.Element;
-export function ServicesShowcase(props: { variant: 'home' | 'overview' }): React.JSX.Element;
+export function ServicesShowcase(): React.JSX.Element;                                       // Home only; the overview page uses ServicePanels (one implementation per layout)
 export function ProcessSection(props: { steps: CompanyContent['process']; scene?: SceneLoader; poster?: ImageAsset; scheme?: Scheme }): React.JSX.Element;
 export function FeaturedProjects(props: { projects: Project[] }): React.JSX.Element;         // renders nothing when empty
 export function ValuesSection(props: { values: CompanyContent['values'] }): React.JSX.Element;
 export function ServiceOverview(props: { service: Service }): React.JSX.Element;
 export function ServiceScope(props: { service: Service }): React.JSX.Element;
 export function ServiceProcess(props: { service: Service }): React.JSX.Element;
-export function ServiceShowcase(props: { service: Service }): React.JSX.Element;            // maps service.showcase → scene / diagram / gallery
+export function DeliveryProcess(props: { id?: string; eyebrow: string; title: string; lede?: string; steps: readonly { title: string; description: string }[]; children?: React.ReactNode }): React.JSX.Element;  // dark numbered steps; ServiceProcess and the services overview
+export function ServicePanels(props: { services: readonly Service[] }): React.JSX.Element;   // services overview: alternating panels with scope, explore and quote links
+export function ServiceShowcase(props: { service: Service }): React.JSX.Element;            // maps service.showcase → scene / diagram / gallery; renders its own Section (id "showcase")
 export const showcaseScenes: Record<'tower' | 'building' | 'bollard', { load: SceneLoader; poster: ImageAsset; label: string }>;  // widgets/service-showcase (WS-5): feeds any LazyScene slot, e.g. Home's ProcessSection; `load` is a client reference
 export function ServiceFaq(props: { service: Service }): React.JSX.Element;
 export function RelatedProjects(props: { service: Service; projects: Project[] }): React.JSX.Element;
@@ -316,6 +319,7 @@ export function ProjectFilter(props: { projects: Project[] }): React.JSX.Element
 
 - File-based routes exactly as in §3; `trailingSlash: true` so every route is `<folder>/index.html`.
 - `services/[slug]` and `projects/[slug]` export `generateStaticParams()` from entity registries and call `notFound()` for unknown slugs; `generateMetadata` is static (reads entity data only).
+- Export fails when a dynamic segment generates no params, so while `projects` is empty the detail page lives in the private folder `projects/_detail/` (linted and type-checked, not routed). Adding the first verified project requires `git mv src/app/projects/_detail "src/app/projects/[slug]"`; the `/projects/` build check (`projects/_lib/check-portfolio.ts`) stops the build until that is done.
 - `typedRoutes: true`: all `href`s are typed; `routes.*` helpers are the only place route strings are built.
 - Metadata: `app/layout.tsx` sets `metadataBase`, default title/template, Open Graph defaults; pages call `buildMetadata()`.
 - Route transitions: wrap `{children}` in `app/layout.tsx` with React 19.3 `<ViewTransition default="none">` and give page roots a short cross-fade class; scroll resets to top on navigation (default behaviour).
@@ -350,6 +354,7 @@ Checklist
 - Images: no default loader; the custom loader maps to pre-generated WebP files. Brand assets use `unoptimized`.
 - Forms post to an external endpoint or fall back to `mailto:`; no server code.
 - Build with Turbopack (default). Do not use `next build --webpack`; Tailwind is wired through the Turbopack loader rule.
+- `npm run build` ends with `scripts/fix-export-segments.mjs`. The client router prefetches each segment from a flat file such as `services/<slug>/__next.services.$d$slug.__PAGE__.txt`, but Next 16.4.3 derives that name with `path.relative()`, so a Windows build writes nested folders (`__next.services/$d$slug/__PAGE__.txt`) and every nested route logs 404 prefetches. The script moves those files to the flat names; on Linux and macOS it finds nothing to do. Re-check after a Next upgrade and drop it once the export is fixed upstream.
 - Hosting: upload `out/`; configure `404.html` as the not-found page; ensure the host serves `<folder>/index.html` for `/<folder>/`; set long cache headers for `/_next/static/*` and `/images/*` at the host.
 - Environment: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_FORM_ENDPOINT`, `NEXT_PUBLIC_ANALYTICS_ID` are read at build time only.
 
@@ -385,10 +390,10 @@ Shared registries that several streams depend on are written completely by WS-0 
 ## 13. Integration approach
 
 1. **Contract freeze**: WS-0 ends with every export in §6–§8 present (stubs allowed, typed exactly). From then on a contract change is a PR that edits ARCHITECTURE.md and every consumer in the same change.
-2. **Branches**: `ws/<name>` off `main`; rebase daily; small PRs; one PR must not touch another stream's directories except through the WS-6 audit path.
+2. **Branches**: `ws/<name>` off `master` (the integration branch); rebase daily; small PRs; one PR must not touch another stream's directories except through the WS-6 audit path.
 3. **Gate**: every PR runs `npm run check` (`eslint .`, `next typegen && tsc --noEmit`, `next build`) and a manual route check from `out/`.
 4. **Decoupling points**: `LazyScene` stub returns the poster until WS-5 lands; `ServiceShowcase` falls back to the gallery when a scene is missing; `FeaturedProjects` and `RelatedProjects` render nothing when data is empty; `ContactChannels` omits null channels. Streams never block on each other's content.
-5. **Merge order**: WS-0 → WS-1..4 in any order → WS-5 → WS-6. Phase 4 hardening runs on `main`.
+5. **Merge order**: WS-0 → WS-1..4 in any order → WS-5 → WS-6. Phase 4 hardening runs on `master`.
 6. **Conflict policy**: if a stream must touch a foreign file, the change is additive, minimal and called out in the PR description; the owning stream reviews it.
 
 ## 14. Phase 0 setup checklist

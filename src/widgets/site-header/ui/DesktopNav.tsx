@@ -206,7 +206,7 @@ function ServicesMenu({
                       <Icon aria-hidden className="size-5" />
                     </span>
                     <span className="flex flex-col gap-1.5">
-                      <span className="type-label text-ink-subtle tabular-nums">{pad(index + 1)}</span>
+                      <span aria-hidden className="type-label text-ink-subtle tabular-nums">{pad(index + 1)}</span>
                       <span className="font-display text-body font-semibold text-ink">{child.label}</span>
                       <span className="text-body-sm text-ink-muted">{child.description}</span>
                     </span>

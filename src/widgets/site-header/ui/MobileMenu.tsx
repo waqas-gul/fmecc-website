@@ -121,7 +121,7 @@ export function MobileMenu({
                           aria-current={isActivePath(pathname, child.href) ? "page" : undefined}
                           className="flex items-baseline gap-4 rounded-sm py-2 text-body-lg text-ink-muted transition-colors duration-150 hover:text-ink aria-[current=page]:text-ink"
                         >
-                          <span className="type-label text-highlight tabular-nums">{pad(childIndex + 1)}</span>
+                          <span aria-hidden className="type-label text-highlight tabular-nums">{pad(childIndex + 1)}</span>
                           {child.label}
                         </Link>
                       </li>

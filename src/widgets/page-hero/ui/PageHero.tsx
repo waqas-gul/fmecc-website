@@ -61,7 +61,7 @@ export function PageHero({
             <div className="lg:col-span-6">
               <div className="relative aspect-video overflow-hidden rounded-md">
                 {isVideo(media) ? (
-                  <VideoBackground video={media} />
+                  <VideoBackground video={media} preload />
                 ) : (
                   <MediaImage asset={media} fill preload sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
                 )}

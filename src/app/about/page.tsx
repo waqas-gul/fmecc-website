@@ -1,22 +1,17 @@
 import { ArrowRight } from "lucide-react";
 
-import { company } from "@/entities/company";
-import { services } from "@/entities/service";
 import { routes, site } from "@/shared/config";
 import { placeholderImage } from "@/shared/lib/media";
 import { buildMetadata } from "@/shared/lib/seo";
 import { LinkButton } from "@/shared/ui";
-import {
-  AboutApproach,
-  AboutRegistrations,
-  AboutServices,
-  AboutStandards,
-  AboutStory,
-  AboutTeam,
-  AboutValues,
-} from "@/widgets/about-sections";
+import { company } from "@/entities/company";
+import { services } from "@/entities/service";
+import { AboutRegistrations, AboutServices, AboutStandards, AboutStory, AboutTeam } from "@/widgets/about-sections";
 import { CtaBand } from "@/widgets/cta-band";
 import { PageHero } from "@/widgets/page-hero";
+import { ProcessSection } from "@/widgets/process-section";
+import { showcaseScenes } from "@/widgets/service-showcase";
+import { ValuesSection } from "@/widgets/values-section";
 
 // Replaced by FMECC site photography (planning/DESIGN.md §12.4); flagged `placeholder: true`.
 const heroMedia = placeholderImage("Construction site photography", "16:9");
@@ -29,7 +24,10 @@ export const metadata = buildMetadata({
   image: heroMedia,
 });
 
-/** About (planning/DESIGN.md §9.3). Leadership, registrations and figures render only when FMECC supplies them. */
+/**
+ * About (planning/DESIGN.md §9.3). Values and the delivery process reuse Home's sections with the
+ * same company data. Leadership, registrations and figures render only when FMECC supplies them.
+ */
 export default function AboutPage() {
   return (
     <>
@@ -51,8 +49,9 @@ export default function AboutPage() {
         }
       />
       <AboutStory statement={company.statement} intro={company.intro} stats={company.stats} />
-      <AboutValues values={company.values} />
-      <AboutApproach steps={company.process} />
+      <ValuesSection values={company.values} />
+      {/* Home's process section and visual; the still poster only, Home keeps the one 3D scene. */}
+      <ProcessSection steps={company.process} poster={showcaseScenes.tower.poster} />
       <AboutServices services={services} />
       <AboutStandards />
       <AboutTeam leadership={company.leadership} />

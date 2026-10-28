@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node scripts/fix-export-segments.mjs",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "images": "node scripts/optimize-images.mjs",

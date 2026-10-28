@@ -17,15 +17,18 @@ const overlayClasses = {
 /**
  * Muted, looping background video over its poster (planning/DESIGN.md §12.3). Sources attach only
  * when the element is within one viewport of the screen and motion is allowed; playback pauses
- * off-screen; a corner control pauses or resumes it (WCAG 2.2.2).
+ * off-screen; a corner control pauses or resumes it (WCAG 2.2.2). In a hero the poster is the
+ * page's LCP image: set `preload` there (and only there) so it is fetched with high priority.
  */
 export function VideoBackground({
   video,
   overlay = "none",
+  preload = false,
   className,
 }: {
   video: VideoAsset;
   overlay?: "none" | "dark" | "brand";
+  preload?: boolean;
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -64,7 +67,7 @@ export function VideoBackground({
 
   return (
     <div ref={rootRef} className={cn("relative h-full w-full overflow-hidden bg-navy-900", className)}>
-      <MediaImage asset={video.poster} fill sizes="100vw" className="object-cover" />
+      <MediaImage asset={video.poster} fill preload={preload} sizes="100vw" className="object-cover" />
       {loaded && (
         <video
           ref={videoRef}

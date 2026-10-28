@@ -5,7 +5,4 @@ export const showcaseContent = {
   title: "What we build, install and maintain.",
   lede: "Open any discipline for its scope of work, delivery process and frequently asked questions.",
   allServices: "All services",
-  explore: "Explore",
-  overviewEyebrow: "Service",
-  quote: "Request a quotation",
 } as const;

@@ -40,7 +40,7 @@ export function HomeIntro() {
             {services.map((service, index) => (
               <Reveal as="li" key={service.slug} delay={index * 0.08} className="border-b border-line">
                 <Link href={routes.service(service.slug)} className="group flex items-start gap-5 py-6">
-                  <span className="type-label pt-1.5 text-highlight tabular-nums">{pad(service.index)}</span>
+                  <span aria-hidden className="type-label pt-1.5 text-highlight tabular-nums">{pad(service.index)}</span>
                   <span className="flex flex-1 flex-col gap-1.5">
                     <span className="font-display text-heading-sm font-semibold text-ink transition-colors duration-150 group-hover:text-accent-text">
                       {service.name}

@@ -1,3 +1,7 @@
 {
-  "logo": null
+  "logo": {
+    "src": "/images/brand/logo-96.webp",
+    "width": 137,
+    "height": 96
+  }
 }

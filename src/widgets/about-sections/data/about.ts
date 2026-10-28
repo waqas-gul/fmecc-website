@@ -3,7 +3,8 @@ import { ClipboardCheck, HardHat } from "lucide-react";
 // TODO(content): About-page drafts for FMECC to confirm, rewrite or remove before launch. They describe
 // ways of working in general terms only: no history, figures, clients, people or certifications
 // (planning/MASTER_PLAN.md §3). The company description, values and process come from
-// src/entities/company; leadership and registrations render only once supplied there.
+// src/entities/company (shown on About by the shared ValuesSection and ProcessSection widgets);
+// leadership and registrations render only once supplied there.
 export const aboutContent = {
   story: {
     eyebrow: "Who we are",
@@ -11,19 +12,9 @@ export const aboutContent = {
       "Every project follows the same way of working, whatever the discipline: understand the site and the requirement, plan the works and the approvals, build with inspections at each stage, and hand over with the documentation the client needs.",
     ],
     statsLabel: "FMECC in figures",
-  },
-  values: {
-    eyebrow: "Mission and values",
-    title: "What guides our work.",
     missionLabel: "Our mission",
     mission:
       "To deliver buildings, telecom sites, security systems and access control that are safe, built to specification and handed over on programme.",
-  },
-  approach: {
-    eyebrow: "How we deliver",
-    title: "From first conversation to handover.",
-    lede: "Whatever the discipline, a project moves through the same stages, and each stage is checked before the next one begins.",
-    note: "Each service page sets out its own stages in detail.",
   },
   services: {
     eyebrow: "What we do",

@@ -16,7 +16,7 @@ export function AboutServices({ services }: { services: readonly Service[] }) {
 
   return (
     <Section id="what-we-do" scheme="light">
-      <SectionHeader index={4} eyebrow={eyebrow} title={title} lede={lede} />
+      <SectionHeader eyebrow={eyebrow} title={title} lede={lede} />
 
       <ul className="mt-14 border-t border-line lg:mt-20">
         {services.map((service) => {

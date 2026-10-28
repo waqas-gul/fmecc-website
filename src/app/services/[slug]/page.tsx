@@ -9,14 +9,8 @@ import { getProjectsByService } from "@/entities/project";
 import { getService, services } from "@/entities/service";
 import { CtaBand } from "@/widgets/cta-band";
 import { PageHero } from "@/widgets/page-hero";
-import {
-  RelatedProjects,
-  ServiceFaq,
-  ServiceGallery,
-  ServiceOverview,
-  ServiceProcess,
-  ServiceScope,
-} from "@/widgets/service-detail";
+import { RelatedProjects, ServiceFaq, ServiceOverview, ServiceProcess, ServiceScope } from "@/widgets/service-detail";
+import { ServiceShowcase } from "@/widgets/service-showcase";
 
 // Static export serves only the four generated pages; any other slug is a 404.
 export const dynamicParams = false;
@@ -69,8 +63,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       <ServiceOverview service={service} />
       <ServiceScope service={service} />
       <ServiceProcess service={service} />
-      {/* Showcase slot. At integration, WS-5's ServiceShowcase (scene, diagram or gallery) replaces this. */}
-      <ServiceGallery service={service} />
+      <ServiceShowcase service={service} />
       <RelatedProjects service={service} projects={getProjectsByService(service.slug, 3)} />
       <ServiceFaq service={service} />
       <CtaBand primary={{ label: "Request a quotation", href: quoteHref }} />

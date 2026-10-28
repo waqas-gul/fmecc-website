@@ -55,11 +55,17 @@ export default function SceneCanvasImpl({ children, tier, className }: SceneCanv
         powerPreference: tier === "high" ? "high-performance" : "default",
         toneMapping: NeutralToneMapping,
         localClippingEnabled: true,
+        // Reading back every program's compile status stalls the GPU; development keeps the check.
+        // Set here, not in onCreated: scenes compile programs while rendering (Studio's PMREM
+        // environment), before onCreated runs. The other two fields keep three's defaults.
+        debug: {
+          checkShaderErrors: process.env.NODE_ENV !== "production",
+          diagnostics: { keywords: false },
+          onShaderError: null,
+        },
       }}
       camera={{ fov: 40, near: 0.1, far: 200, position: [0, 2, 12] }}
       onCreated={({ gl }) => {
-        // Reading back every program's compile status stalls the GPU; development keeps the check.
-        gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production";
         // R3F forces a context loss itself on unmount; only a loss while mounted is a failure.
         gl.domElement.addEventListener("webglcontextlost", () => {
           if (mounted.current) runtime?.onFail();

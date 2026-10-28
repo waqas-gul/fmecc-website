@@ -123,7 +123,8 @@ export function ProcessScroller({
 
       {poster && (
         <div className="max-lg:order-first lg:col-span-6 lg:col-start-7">
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md border border-line md:aspect-video lg:sticky lg:top-[calc(var(--header-h)_+_2rem)] lg:aspect-[4/5] lg:max-h-[calc(100svh_-_var(--header-h)_-_4rem)]">
+          {/* 4:5 at every width, matching the scene posters; capped on tablets so it stays in view. */}
+          <div className="relative mx-auto aspect-[4/5] w-full overflow-hidden rounded-md border border-line md:max-w-md lg:sticky lg:top-[calc(var(--header-h)_+_2rem)] lg:max-h-[calc(100svh_-_var(--header-h)_-_4rem)] lg:max-w-none">
             {scene ? (
               <div className="absolute inset-0">
                 <LazyScene load={scene} poster={poster} label={sceneLabel} progress={progress} className="h-full w-full" />

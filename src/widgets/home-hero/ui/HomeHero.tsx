@@ -36,7 +36,7 @@ export function HomeHero() {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <div data-animate="hero-media" className="absolute inset-0">
           <div className="absolute inset-0 transition-transform duration-1600 ease-out-expo starting:scale-108 motion-reduce:transition-none">
-            <VideoBackground video={heroVideo} overlay="dark" />
+            <VideoBackground video={heroVideo} overlay="dark" preload />
           </div>
         </div>
         <ColumnGuides />
@@ -96,7 +96,7 @@ export function HomeHero() {
                   href={routes.service(service.slug)}
                   className="group flex h-full min-h-16 items-center gap-3 py-4 pe-3 text-body-sm font-semibold text-ink lg:gap-4 lg:py-6 lg:pe-6"
                 >
-                  <span className="type-label text-highlight tabular-nums">{pad(service.index)}</span>
+                  <span aria-hidden className="type-label text-highlight tabular-nums">{pad(service.index)}</span>
                   <span className="flex-1">{service.shortName}</span>
                   <ArrowRight
                     aria-hidden
