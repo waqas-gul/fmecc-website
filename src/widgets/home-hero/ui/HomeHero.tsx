@@ -88,15 +88,15 @@ export function HomeHero() {
         </div>
       </div>
 
-      <nav
-        aria-label={heroContent.quickLinksLabel}
-        className={cn("relative border-t border-line bg-surface", fadeUp)}
-        style={delay(400)}
-      >
+      <nav aria-label={heroContent.quickLinksLabel} className="relative border-t border-line bg-surface">
         <div className="shell-content flex">
           <ul className="grid flex-1 grid-cols-2 lg:grid-cols-4">
             {services.map((service, index) => (
-              <li key={service.slug} className={cn("border-line", cellClasses[index % cellClasses.length])}>
+              <li
+                key={service.slug}
+                className={cn("border-line", cellClasses[index % cellClasses.length], fadeUp)}
+                style={delay(440 + index * 60)}
+              >
                 <Link
                   href={routes.service(service.slug)}
                   className="group flex h-full min-h-16 items-center gap-3 py-4 pe-3 text-body-sm font-semibold text-ink lg:gap-4 lg:py-6 lg:pe-6"
@@ -114,7 +114,11 @@ export function HomeHero() {
 
           <a
             href="#intro"
-            className="type-label ms-6 flex min-h-11 items-center gap-4 border-l border-line ps-6 text-ink-muted transition-colors duration-150 hover:text-ink max-lg:hidden"
+            className={cn(
+              "type-label ms-6 flex min-h-11 items-center gap-4 border-l border-line ps-6 text-ink-muted hover:text-ink max-lg:hidden",
+              "transition-[opacity,translate,color] duration-600 ease-out-expo starting:translate-y-4 starting:opacity-0 motion-reduce:transition-none",
+            )}
+            style={delay(680)}
           >
             {heroContent.scrollCue}
             <span className="sr-only"> to the introduction</span>

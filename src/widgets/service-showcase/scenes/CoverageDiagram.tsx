@@ -26,6 +26,10 @@ import {
 } from "../model/coverage";
 
 const LABEL = "font-mono uppercase";
+// Below 640 px the 960-unit plan renders at about a third of its size: strokes keep their screen width
+// (non-scaling) and device markers grow, so lines, dashes and devices stay legible on phones.
+const CRISP = { vectorEffect: "non-scaling-stroke" } as const;
+const MARKER = "origin-center [transform-box:fill-box] max-sm:scale-[1.8]";
 
 // Scroll-linked reveal without GSAP: the figure carries `--p` (0–1; unset means 1, the finished
 // plan). Each element turns it into its own eased progress `--k` over [--at, --at + --span] and
@@ -135,17 +139,19 @@ export function CoverageDiagram({ caption }: { caption: string }) {
             fill="none"
             className="stroke-line-strong"
             strokeWidth={2}
+            {...CRISP}
           />
           <g className="stroke-line-strong" strokeWidth={1.5}>
             {Array.from({ length: Math.floor(PARKING.width / PARKING.stall) + 1 }, (_, i) => (
               <path
                 key={i}
                 d={`M${PARKING.x + i * PARKING.stall} ${PARKING.y} v48 M${PARKING.x + i * PARKING.stall} ${PARKING.y + PARKING.height} v-48`}
+                {...CRISP}
               />
             ))}
           </g>
-          <rect {...BUILDING} rx={3} className="fill-surface-raised stroke-line-strong" strokeWidth={1.5} />
-          <rect {...GATEHOUSE} rx={2} className="fill-surface-raised stroke-line-strong" strokeWidth={1.5} />
+          <rect {...BUILDING} rx={3} className="fill-surface-raised stroke-line-strong" strokeWidth={1.5} {...CRISP} />
+          <rect {...GATEHOUSE} rx={2} className="fill-surface-raised stroke-line-strong" strokeWidth={1.5} {...CRISP} />
           <path d={`M${GATE.from + 6} ${SITE.y + SITE.height} H${GATE.to - 34}`} className="stroke-ink-subtle" strokeWidth={3} strokeLinecap="round" />
           <g className={cn(LABEL, "fill-ink-subtle max-sm:hidden")} fontSize={13} letterSpacing={1.8}>
             <text x={BUILDING.x + BUILDING.width - 16} y={BUILDING.y + BUILDING.height - 18} textAnchor="end">
@@ -181,6 +187,7 @@ export function CoverageDiagram({ caption }: { caption: string }) {
                   d={`M${device.x} ${device.y} L${CONTROL_POINT.x} ${CONTROL_POINT.y}`}
                   className={FADE}
                   style={at(0.735 + index * 0.012, 0.12)}
+                  {...CRISP}
                 />
               ))}
             </g>
@@ -199,7 +206,7 @@ export function CoverageDiagram({ caption }: { caption: string }) {
             {zones.map((zone, index) => (
               <g key={zone.id} className={FADE} style={at(index * 0.06, 0.15)}>
                 <path d={zone.d} fill="none" className="stroke-highlight/25" strokeWidth={12} />
-                <path d={zone.d} fill="none" className="stroke-highlight" strokeWidth={1.5} strokeDasharray="6 5" />
+                <path d={zone.d} fill="none" className="stroke-highlight" strokeWidth={1.5} strokeDasharray="6 5" {...CRISP} />
                 <text
                   x={zone.label.x}
                   y={zone.label.y}
@@ -224,6 +231,7 @@ export function CoverageDiagram({ caption }: { caption: string }) {
                 className={cn(SWEEP, "stroke-highlight/60")}
                 style={at(0.2 + index * 0.06, 0.22, camera)}
                 strokeWidth={1}
+                {...CRISP}
               />
             ))}
             <circle
@@ -234,15 +242,18 @@ export function CoverageDiagram({ caption }: { caption: string }) {
               style={at(0.2 + cameras.length * 0.06, 0.22, ptz)}
               strokeWidth={1}
               strokeDasharray="4 4"
+              {...CRISP}
             />
             {cameras.map((camera) => (
-              <g key={camera.id}>
+              <g key={camera.id} className={MARKER}>
                 <circle cx={camera.x} cy={camera.y} r={7} className="fill-surface stroke-highlight" strokeWidth={2} />
                 <circle cx={camera.x} cy={camera.y} r={2.5} className="fill-highlight" />
               </g>
             ))}
-            <circle cx={ptz.x} cy={ptz.y} r={9} className="fill-surface stroke-highlight" strokeWidth={2} />
-            <circle cx={ptz.x} cy={ptz.y} r={4} className="fill-highlight" />
+            <g className={MARKER}>
+              <circle cx={ptz.x} cy={ptz.y} r={9} className="fill-surface stroke-highlight" strokeWidth={2} />
+              <circle cx={ptz.x} cy={ptz.y} r={4} className="fill-highlight" />
+            </g>
             <g className={cn(LABEL, "fill-highlight max-sm:hidden")} fontSize={11} letterSpacing={1.4}>
               {cameras.map((camera) => (
                 <text
@@ -267,13 +278,13 @@ export function CoverageDiagram({ caption }: { caption: string }) {
                 cx={x}
                 cy={SITE.y + SITE.height - 16}
                 r={6}
-                className={cn(POP, "fill-accent stroke-accent-text")}
+                className={cn(POP, MARKER, "fill-accent stroke-accent-text")}
                 style={at(0.62 + index * 0.03, 0.12)}
                 strokeWidth={1.5}
               />
             ))}
             {readers.map((reader, index) => (
-              <g key={reader.id} className={POP} style={at(0.71 + index * 0.03, 0.12)}>
+              <g key={reader.id} className={cn(POP, MARKER)} style={at(0.71 + index * 0.03, 0.12)}>
                 <rect x={reader.x - 7} y={reader.y - 7} width={14} height={14} rx={2} className="fill-accent stroke-accent-text" strokeWidth={1.5} />
                 <text
                   x={reader.x + 14}

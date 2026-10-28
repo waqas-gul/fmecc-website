@@ -14,3 +14,8 @@ How they were made (repeat whenever a scene's geometry, materials or camera chan
 3. Save here as `<scene>-scene.png` and run `npm run images -- --media`.
 
 Use the posters in `scheme="dark"` sections; on another surface the navy-950 background shows.
+
+`building-concept.png` is `building-scene.png` traced as cyan linework on a drafting grid by
+`node scripts/concept-drawing.mjs` (Sobel edges, no new artwork), so Home's concept-to-construction
+slider compares two pixel-aligned views of one illustrative model. Re-run it after regenerating the
+building poster, then `npm run images -- --media`.

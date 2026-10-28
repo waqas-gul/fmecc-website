@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Route } from "next";
 
 import { cn } from "@/shared/lib/utils";
@@ -10,6 +11,8 @@ const isVideo = (media: ImageAsset | VideoAsset): media is VideoAsset => "mp4" i
 /**
  * Hero for inner pages (planning/DESIGN.md §9.1): breadcrumbs, numbered eyebrow, display title,
  * lede and actions, with optional 16:9 media. Sits under the overlay header and owns the page's h1.
+ * `mediaTransition` names the media frame for a shared-element morph from the card that links here
+ * (React <ViewTransition>, ARCHITECTURE.md §9).
  */
 export function PageHero({
   eyebrow,
@@ -20,6 +23,7 @@ export function PageHero({
   scheme = "brand",
   breadcrumbs,
   actions,
+  mediaTransition,
 }: {
   eyebrow?: string;
   index?: number;
@@ -29,7 +33,18 @@ export function PageHero({
   scheme?: Scheme;
   breadcrumbs?: { label: string; href?: Route }[];
   actions?: React.ReactNode;
+  mediaTransition?: string;
 }) {
+  const frame = media && (
+    <div className="relative aspect-video overflow-hidden rounded-md">
+      {isVideo(media) ? (
+        <VideoBackground video={media} preload />
+      ) : (
+        <MediaImage asset={media} fill preload sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+      )}
+    </div>
+  );
+
   return (
     <Section scheme={scheme} spacing="none" container={false} guides className="overflow-hidden">
       <div className="shell-content relative flex flex-col justify-end pt-[calc(var(--header-h)+2.5rem)] pb-14 lg:min-h-[60svh] lg:pt-[calc(var(--header-h)+4rem)] lg:pb-20">
@@ -59,13 +74,13 @@ export function PageHero({
 
           {media && (
             <div className="lg:col-span-6">
-              <div className="relative aspect-video overflow-hidden rounded-md">
-                {isVideo(media) ? (
-                  <VideoBackground video={media} preload />
-                ) : (
-                  <MediaImage asset={media} fill preload sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
-                )}
-              </div>
+              {mediaTransition ? (
+                <ViewTransition name={mediaTransition} share="morph" default="none">
+                  {frame}
+                </ViewTransition>
+              ) : (
+                frame
+              )}
             </div>
           )}
         </div>

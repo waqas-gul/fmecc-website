@@ -1,4 +1,4 @@
-import { CalendarCheck, ClipboardCheck, HardHat, ShieldCheck } from "lucide-react";
+import { ClipboardCheck, DraftingCompass, HardHat, Workflow } from "lucide-react";
 
 import type { CompanyContent } from "../model/types";
 
@@ -11,11 +11,29 @@ export const company: CompanyContent = {
   intro: [
     "Future Middle East Construction Company (FMECC) works across four disciplines: building construction, telecom tower rollout and site construction, security system installation and maintenance, and hydraulic parking bollard installation.",
   ],
+  // Draft "Why FMECC" positioning, covered by the TODO above: each value describes an intended way
+  // of working, not a certification, track record, statistic or guarantee.
   values: [
-    { icon: HardHat, title: "Safety", description: "Work is planned around safe access, supervision and site discipline." },
-    { icon: ClipboardCheck, title: "Quality", description: "Each stage is inspected and documented before the next begins." },
-    { icon: CalendarCheck, title: "Schedule", description: "Programmes are planned, tracked and reported openly." },
-    { icon: ShieldCheck, title: "Compliance", description: "Work follows the applicable codes, permits and client standards." },
+    {
+      icon: HardHat,
+      title: "Safety-focused approach",
+      description: "Work is planned around safe access, supervision and site discipline, with risks reviewed before each stage starts.",
+    },
+    {
+      icon: ClipboardCheck,
+      title: "Quality-minded execution",
+      description: "Each stage is inspected and recorded before the next begins, against the agreed drawings and specifications.",
+    },
+    {
+      icon: Workflow,
+      title: "Coordinated delivery",
+      description: "Programme, trades and suppliers are planned together, and progress is reported openly against the schedule.",
+    },
+    {
+      icon: DraftingCompass,
+      title: "Engineering and infrastructure focus",
+      description: "Buildings, telecom sites, security systems and access control: technical work handled by one contractor.",
+    },
   ],
   process: [
     { title: "Consult", description: "Understand the site, the scope and the constraints." },

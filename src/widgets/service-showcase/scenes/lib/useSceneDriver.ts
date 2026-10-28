@@ -12,17 +12,24 @@ export interface SceneDrive {
   pointerY: number;
   /** Damped hover amount, 0–1 (mouse only; touch never hovers). */
   hover: number;
+  /**
+   * Entrance, 0–1: runs once over `INTRO` seconds of on-screen frames after the scene first draws,
+   * so cameras can settle into their framing as the scene fades in. 1 with reduced motion.
+   */
+  intro: number;
 }
 
 const SETTLED = 1e-4;
+const INTRO = 1.6;
 
 /**
  * Drives a scene from `SceneProps` with the on-demand frame loop (planning/DESIGN.md §11): frames
- * are requested only while a value is still easing towards its target and the scene is on screen.
+ * are requested only while a value is still easing towards its target (or the one-time entrance is
+ * still running) and the scene is on screen.
  * Runs before other frame callbacks (priority −1), so consumers read this frame's values.
  */
 export function useSceneDriver({ progress, active, reducedMotion }: Omit<SceneProps, "tier">) {
-  const drive = useRef<SceneDrive>({ progress, pointerX: 0, pointerY: 0, hover: 0 });
+  const drive = useRef<SceneDrive>({ progress, pointerX: 0, pointerY: 0, hover: 0, intro: reducedMotion ? 1 : 0 });
   const target = useRef({ progress, pointerX: 0, pointerY: 0, hover: 0 });
   const canvas = useThree((state) => state.gl.domElement);
   const invalidate = useThree((state) => state.invalidate);
@@ -69,6 +76,11 @@ export function useSceneDriver({ progress, active, reducedMotion }: Omit<ScenePr
       const next = reducedMotion ? goal[key] : MathUtils.damp(current[key], goal[key], lambda, step);
       current[key] = Math.abs(next - goal[key]) < SETTLED ? goal[key] : next;
       if (current[key] !== goal[key]) moving = true;
+    }
+    // Linear in time and bounded, so the entrance costs at most INTRO seconds of frames.
+    if (current.intro < 1) {
+      current.intro = reducedMotion ? 1 : Math.min(1, current.intro + step / INTRO);
+      if (current.intro < 1) moving = true;
     }
     if (moving && active) invalidate();
   }, -1);

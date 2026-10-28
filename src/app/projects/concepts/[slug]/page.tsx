@@ -11,7 +11,14 @@ import { ArrowRight, Info } from "lucide-react";
 import { routes, serviceNav } from "@/shared/config";
 import { buildMetadata } from "@/shared/lib/seo";
 import { LinkButton, Reveal, Section, SectionHeader } from "@/shared/ui";
-import { ConceptCard, conceptNotice, concepts, getConcept } from "@/entities/concept";
+import {
+  ConceptCard,
+  conceptMediaTransition,
+  conceptNotice,
+  conceptNumber,
+  concepts,
+  getConcept,
+} from "@/entities/concept";
 import { CtaBand } from "@/widgets/cta-band";
 import { PageHero } from "@/widgets/page-hero";
 import { ProjectGallery } from "@/widgets/project-detail";
@@ -43,6 +50,14 @@ export default async function ConceptPage({ params }: PageProps<"/projects/conce
 
   const service = serviceNav.find((item) => item.slug === concept.service);
   const others = concepts.filter((candidate) => candidate.slug !== concept.slug);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  // Facts about this page only: a concept has no client, location, date, value or outcome.
+  const facts = [
+    { label: "Concept", value: `${pad(conceptNumber(concept.slug))} of ${pad(concepts.length)}` },
+    { label: "Service", value: service?.label ?? concept.service },
+    { label: "Status", value: "Illustrative, not a delivered project" },
+    { label: "Hypothetical scope", value: `${concept.scope.length} work packages` },
+  ];
 
   return (
     <>
@@ -51,6 +66,7 @@ export default async function ConceptPage({ params }: PageProps<"/projects/conce
         title={concept.title}
         lede={concept.summary}
         media={concept.hero}
+        mediaTransition={conceptMediaTransition(concept.slug)}
         breadcrumbs={[
           { label: "Home", href: routes.home },
           { label: "Projects", href: routes.projects },
@@ -69,6 +85,16 @@ export default async function ConceptPage({ params }: PageProps<"/projects/conce
       />
 
       <Section id="overview" scheme="light">
+        <Reveal className="mb-14 lg:mb-20">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-y border-line py-8 lg:grid-cols-4 lg:gap-x-8">
+            {facts.map((fact) => (
+              <div key={fact.label} className="flex flex-col gap-2.5">
+                <dt className="type-label text-ink-subtle">{fact.label}</dt>
+                <dd className="font-display text-body-lg font-semibold text-ink">{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </Reveal>
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-7">
             <h2 className="type-label flex items-center gap-3 text-ink-muted">
@@ -125,6 +151,7 @@ export default async function ConceptPage({ params }: PageProps<"/projects/conce
         images={concept.gallery.length > 0 ? [concept.hero, ...concept.gallery] : []}
         title="Concept imagery"
         lede="Licensed stock photography and 3D illustrations, shown for illustration only. They do not depict FMECC projects."
+        label="Illustrative concept"
       />
 
       <Section scheme="light" container="wide">
@@ -141,7 +168,7 @@ export default async function ConceptPage({ params }: PageProps<"/projects/conce
         </div>
         <ul className="mt-12 grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3 lg:gap-x-8">
           {others.map((other, index) => (
-            <Reveal as="li" key={other.slug} delay={index * 0.06} className="flex">
+            <Reveal as="li" key={other.slug} variant="media-scale" delay={index * 0.08} className="flex">
               <ConceptCard concept={other} variant="compact" className="flex-1" />
             </Reveal>
           ))}

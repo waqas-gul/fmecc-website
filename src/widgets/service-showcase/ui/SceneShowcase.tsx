@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { MoveVertical } from "lucide-react";
 
 import { mediaQueries } from "@/shared/lib/animation";
 import { cn } from "@/shared/lib/utils";
@@ -27,12 +28,14 @@ export function SceneShowcase({
   poster,
   label,
   caption,
+  hint,
   stages,
 }: {
   load: SceneLoader;
   poster: ImageAsset;
   label: string;
   caption: string;
+  hint: string;
   stages: ShowcaseStage[];
 }) {
   const scopeRef = useRef<HTMLDivElement>(null);
@@ -66,6 +69,18 @@ export function SceneShowcase({
         <figure className="mx-auto w-full max-w-[30rem] lg:w-fit lg:max-w-full">
           <div className="relative mx-auto aspect-[4/5] w-full lg:h-[min(calc(100svh-var(--header-h)-7rem),48rem)] lg:w-auto lg:max-w-full">
             <LazyScene load={load} poster={poster} label={label} progress={progress} className="h-full w-full" />
+            {/* Scroll hint until the model starts moving. Prerendered HTML and reduced motion rest at
+                progress 1, so it never shows there; the scene's text alternative covers it for screen readers. */}
+            <span
+              aria-hidden
+              className={cn(
+                "type-label pointer-events-none absolute top-4 left-4 flex items-center gap-2 rounded-full border border-line-strong bg-surface/70 px-3 py-2 text-ink backdrop-blur-sm transition-opacity duration-500 ease-standard sm:top-5 sm:left-5",
+                progress < 0.25 ? "opacity-100" : "opacity-0",
+              )}
+            >
+              <MoveVertical className="size-3.5 text-highlight" />
+              {hint}
+            </span>
             {/* Registration marks at the frame corners: technical detail, not content. */}
             <span aria-hidden className="pointer-events-none absolute top-0 left-0 size-3 border-t border-l border-highlight" />
             <span aria-hidden className="pointer-events-none absolute top-0 right-0 size-3 border-t border-r border-highlight" />

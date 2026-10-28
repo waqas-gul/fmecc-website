@@ -25,7 +25,7 @@ import { SceneCanvas, type SceneProps } from "@/shared/three";
 
 import { bollardTimeline } from "../model/timelines";
 import { SCENE_FRAME_MASK } from "./lib/frame";
-import { ease, lerp, span } from "./lib/math";
+import { ease, lerp, settle, span } from "./lib/math";
 import { Gauge } from "./lib/overlays";
 import { palette } from "./lib/palette";
 import { Studio } from "./lib/Studio";
@@ -72,6 +72,30 @@ function notchedSlab(x0: number, x1: number, z0: number, notches: readonly numbe
   return new ExtrudeGeometry(shape, { depth: thickness, bevelEnabled: false, curveSegments: 28 }).rotateX(Math.PI / 2);
 }
 
+/**
+ * Brushed finish for the stainless bodies: fine vertical streaks of slightly different roughness
+ * around the circumference (cylinder U), so highlights break up like brushed steel. Deterministic,
+ * so poster renders stay identical.
+ */
+function createBrushedTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 4;
+  const context = canvas.getContext("2d")!;
+  let seed = 11;
+  const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let x = 0; x < 512; x++) {
+    const shade = Math.round(200 + random() * 55);
+    context.fillStyle = `rgb(${shade} ${shade} ${shade})`;
+    context.fillRect(x, 0, 1, 4);
+  }
+  const texture = new CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = RepeatWrapping;
+  texture.repeat.set(3, 1);
+  texture.anisotropy = 4;
+  return texture;
+}
+
 /** 400 mm pavers with fine joints; a deterministic speckle keeps poster renders identical. */
 function createPavingTexture() {
   const canvas = document.createElement("canvas");
@@ -104,8 +128,10 @@ function useBollardResources() {
     const cutaway = [new Plane(new Vector3(0, 0, -1), 0), new Plane(new Vector3(0, 1, 0), 0)];
     const front = [new Plane(new Vector3(0, 0, -1), 0)];
     const paving = createPavingTexture();
+    const brushed = createBrushedTexture();
     return {
       paving,
+      brushed,
       pavingMaterial: new MeshStandardMaterial({ map: paving, color: palette.neutral200, roughness: 0.85 }),
       subBase: new MeshStandardMaterial({ color: palette.neutral500, roughness: 0.95 }),
       ground: new MeshStandardMaterial({ color: palette.neutral700, roughness: 1 }),
@@ -118,12 +144,14 @@ function useBollardResources() {
         clipIntersection: true,
         clipShadows: true,
       }),
-      // Brushed stainless: rough enough to pick up the key light, not just the dark room.
+      // Brushed stainless: rough enough to pick up the key light, not just the dark room; the
+      // roughness map streaks the highlights vertically.
       stainless: new MeshStandardMaterial({
-        color: palette.neutral100,
-        metalness: 0.65,
-        roughness: 0.34,
-        envMapIntensity: 2,
+        color: palette.white,
+        metalness: 0.72,
+        roughness: 0.24,
+        roughnessMap: brushed,
+        envMapIntensity: 2.8,
         clippingPlanes: cutaway,
         clipIntersection: true,
         clipShadows: true,
@@ -167,8 +195,9 @@ function Bollard({ index, x, drive, resources }: { index: number; x: number; dri
   const body = useRef<Group>(null);
   const ram = useRef<Mesh>(null);
   const led = useDisposables(() => ({ material: new MeshBasicMaterial({ color: OFF.clone(), toneMapped: false }) }));
+  const lastRise = useRef<number | null>(null);
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     const { progress, hover } = drive.current;
     const rise = riseOf(progress, index);
     const top = 0.005 + rise * RISE;
@@ -178,8 +207,13 @@ function Bollard({ index, x, drive, resources }: { index: number; x: number; dri
       ram.current.scale.y = length;
       ram.current.position.y = -1.1 + length / 2;
     }
-    // The LED crown lights as the bollard reaches full height; hovering brightens it slightly.
-    led.material.color.lerpColors(OFF, ON, Math.min(1, span(rise, 0.6, 1) * (0.85 + 0.15 * hover)));
+    // The LED crown flashes while the bollard travels, as warning lights do, and stays lit at full
+    // height; hovering brightens it slightly. Frames only run while progress is still easing, so the
+    // flashing costs no extra loop and a settled bollard rests steady.
+    const travelling = lastRise.current !== null && Math.abs(rise - lastRise.current) > 1e-4 && rise > 0.02 && rise < 0.98;
+    lastRise.current = rise;
+    const level = travelling ? (Math.sin(clock.elapsedTime * 16) > 0 ? 1 : 0.25) : span(rise, 0.6, 1);
+    led.material.color.lerpColors(OFF, ON, Math.min(1, level * (0.85 + 0.15 * hover)));
   });
 
   return (
@@ -225,13 +259,19 @@ function Bollards({ progress, active, tier, reducedMotion }: SceneProps) {
   const resources = useBollardResources();
 
   // A product view: three-quarter, just above ground level, easing in slightly as the row rises.
+  // On first draw the camera settles in from slightly wider (drive.intro).
   useFrame(({ camera, size }) => {
-    const { progress: p, pointerX, pointerY } = drive.current;
+    const { progress: p, pointerX, pointerY, intro } = drive.current;
     const t = ease(p);
+    const entrance = settle(intro);
     const fit = Math.max(1, 0.8 / (size.width / size.height));
-    const distance = lerp(6.9, 6.3, t) * fit;
-    const azimuth = MathUtils.degToRad(34 + pointerX * 3);
-    camera.position.set(Math.sin(azimuth) * distance, lerp(1.5, 1.2, t) - pointerY * 0.2, Math.cos(azimuth) * distance - 0.5);
+    const distance = lerp(6.9, 6.3, t) * fit * (1 + 0.1 * entrance);
+    const azimuth = MathUtils.degToRad(34 + pointerX * 3 + 8 * entrance);
+    camera.position.set(
+      Math.sin(azimuth) * distance,
+      lerp(1.5, 1.2, t) - pointerY * 0.2 + 0.35 * entrance,
+      Math.cos(azimuth) * distance - 0.5,
+    );
     camera.lookAt(0, lerp(-0.6, -0.45, t), -0.5);
   });
 

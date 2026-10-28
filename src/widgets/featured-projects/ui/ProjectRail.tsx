@@ -1,14 +1,16 @@
 "use client";
 
-import { mediaQueries } from "@/shared/lib/animation";
+import { mediaQueries, motionTokens } from "@/shared/lib/animation";
 import { gsap, useGsap } from "@/shared/lib/gsap";
 import { cn } from "@/shared/lib/utils";
 
 /**
  * Featured projects track (planning/DESIGN.md §8, row 5). Below 1024 px, and with reduced motion,
  * it is a native horizontal scroller with snap points. At ≥ 1024 px it pins and vertical scroll
- * scrubs it sideways, for at most 150 % of the viewport height; keyboard focus on an off-screen
- * card scrolls the page to the position that brings the card into view.
+ * scrubs it sideways, for at most 150 % of the viewport height, while each card's image drifts
+ * against the movement (parallax); keyboard focus on an off-screen card scrolls the page to the
+ * position that brings the card into view. With motion allowed, the cards rise in sequence as the
+ * rail arrives; they rest visible without JavaScript.
  */
 export function ProjectRail({ label, className, children }: { label: string; className?: string; children: React.ReactNode }) {
   const scopeRef = useGsap<HTMLDivElement>((_ctx, scope) => {
@@ -16,7 +18,23 @@ export function ProjectRail({ label, className, children }: { label: string; cla
     const items = gsap.utils.toArray<HTMLElement>("[data-animate='rail-item']", scope);
     if (!track || items.length === 0) return;
 
-    gsap.matchMedia().add(`${mediaQueries.lg} and ${mediaQueries.motionOk}`, () => {
+    const media = gsap.matchMedia();
+
+    media.add(mediaQueries.motionOk, () => {
+      // Only when the rail is still below the fold: content already on screen never blinks out.
+      if (scope.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+      gsap.from(items, {
+        y: 64,
+        opacity: 0,
+        duration: motionTokens.duration.cinematic,
+        ease: motionTokens.ease.outExpo,
+        stagger: 0.1,
+        clearProps: "opacity,transform",
+        scrollTrigger: { trigger: scope, start: "top 85%", once: true },
+      });
+    });
+
+    media.add(`${mediaQueries.lg} and ${mediaQueries.motionOk}`, () => {
       const first = items[0];
       const last = items[items.length - 1];
       // Scroll the last card until its right edge meets the content edge (the track's end padding).
@@ -39,17 +57,36 @@ export function ProjectRail({ label, className, children }: { label: string; cla
         },
       });
 
+      // Parallax: each image is scaled to overfill its frame and drifts sideways as its card crosses
+      // the viewport. GSAP owns the image's `transform`; the hover zoom uses `scale`, so both apply.
+      items.forEach((item) => {
+        const image = item.querySelector("img");
+        if (!image) return;
+        gsap.fromTo(
+          image,
+          { xPercent: -4, scale: 1.1 },
+          {
+            xPercent: 4,
+            scale: 1.1,
+            ease: "none",
+            scrollTrigger: { trigger: item, containerAnimation: tween, start: "left right", end: "right left", scrub: true },
+          },
+        );
+      });
+
       let frame = 0;
       const onFocusIn = (event: FocusEvent) => {
         const item = (event.target as HTMLElement).closest<HTMLElement>("[data-animate='rail-item']");
         const trigger = tween.scrollTrigger;
         if (!item || !trigger) return;
         const progress = gsap.utils.clamp(0, 1, (item.offsetLeft - first.offsetLeft) / distance());
-        // After the browser's own focus scroll, which runs once this event has been dispatched.
+        // After the browser's own focus scroll, which runs once this event has been dispatched; skipped
+        // if focus has already moved on (a quick Tab past the last card must not pull the page back).
         cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() =>
-          window.scrollTo({ top: trigger.start + progress * (trigger.end - trigger.start), behavior: "instant" }),
-        );
+        frame = requestAnimationFrame(() => {
+          if (!item.contains(document.activeElement)) return;
+          window.scrollTo({ top: trigger.start + progress * (trigger.end - trigger.start), behavior: "instant" });
+        });
       };
       track.addEventListener("focusin", onFocusIn);
       return () => {

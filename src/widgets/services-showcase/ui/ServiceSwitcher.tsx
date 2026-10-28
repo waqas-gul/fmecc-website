@@ -9,7 +9,7 @@ import { mediaQueries } from "@/shared/lib/animation";
 import { gsap, useGsap } from "@/shared/lib/gsap";
 import { cn } from "@/shared/lib/utils";
 import type { ImageAsset } from "@/shared/types/media";
-import { MediaImage } from "@/shared/ui";
+import { MediaImage, Reveal } from "@/shared/ui";
 
 /** Plain service fields; a `Service` holds an icon component and cannot cross into the client. */
 export interface SwitcherItem {
@@ -120,7 +120,7 @@ export function ServiceSwitcher({ items, className }: { items: SwitcherItem[]; c
         </div>
 
         <div className="col-span-6 col-start-7">
-          <div className="relative aspect-[4/5] max-h-[calc(100svh_-_var(--header-h)_*_2)] w-full overflow-hidden rounded-md bg-navy-800">
+          <Reveal variant="media-scale" className="relative aspect-[4/5] max-h-[calc(100svh_-_var(--header-h)_*_2)] w-full overflow-hidden rounded-md bg-navy-800">
             {items.map((item, index) => {
               const isActive = index === active;
               return (
@@ -128,8 +128,8 @@ export function ServiceSwitcher({ items, className }: { items: SwitcherItem[]; c
                   key={item.slug}
                   aria-hidden={!isActive}
                   className={cn(
-                    "absolute inset-0 transition-[opacity,scale] duration-500 ease-out-expo motion-reduce:duration-150",
-                    isActive ? "opacity-100" : "opacity-0 motion-safe:scale-104",
+                    "absolute inset-0 transition-[opacity,scale] duration-700 ease-out-expo motion-reduce:duration-150",
+                    isActive ? "opacity-100" : "opacity-0 motion-safe:scale-106",
                   )}
                 >
                   <MediaImage asset={item.media} fill sizes="(min-width: 1280px) 39rem, 50vw" className="object-cover" />
@@ -145,7 +145,7 @@ export function ServiceSwitcher({ items, className }: { items: SwitcherItem[]; c
                 </div>
               );
             })}
-          </div>
+          </Reveal>
         </div>
       </div>
     </div>

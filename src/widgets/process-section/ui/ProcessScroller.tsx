@@ -24,7 +24,8 @@ const corners = [
 /**
  * Scroll layer of the process section (planning/DESIGN.md §8, row 4). Children are the
  * server-rendered step list; this island scrubs the rail segments between nodes, lights each node
- * as it crosses the viewport line, and passes the same progress (0–1) to the tower scene; until a
+ * as it crosses the viewport line, marks each step done, current or upcoming (`data-state`, styled
+ * by the list) and passes the same progress (0–1) to the tower scene; until a
  * scene draws, the poster is uncovered from the ground up over the same range. The visual stays in
  * view with CSS `position: sticky`, so the section never pins. Without JavaScript or with reduced
  * motion, everything rests in its end state: every segment filled, every node lit, the poster whole.
@@ -58,13 +59,22 @@ export function ProcessScroller({
       const frame = scope.querySelector("[data-animate='process-frame']");
       const nodes = gsap.utils.toArray<HTMLElement>("[data-animate='process-node']", scope);
       const segments = gsap.utils.toArray<HTMLElement>("[data-animate='process-segment']", scope);
+      const steps = gsap.utils.toArray<HTMLElement>("[data-animate='process-step']", scope);
       if (!list || nodes.length === 0) return;
 
       gsap.matchMedia().add(mediaQueries.motionOk, () => {
         const nodeTriggers: ScrollTrigger[] = [];
         // Counted from the scroll position, not toggle callbacks: a fast jump can pass a node's
-        // whole trigger range without toggling it.
-        const sync = () => setReached(nodeTriggers.filter((trigger) => trigger.scroll() >= trigger.start).length);
+        // whole trigger range without toggling it. The last reached step is current; before the
+        // first node crosses the line, the first step is.
+        const sync = () => {
+          const count = nodeTriggers.filter((trigger) => trigger.scroll() >= trigger.start).length;
+          const active = Math.max(count, 1) - 1;
+          steps.forEach((step, index) => {
+            step.dataset.state = index < active ? "done" : index === active ? "current" : "upcoming";
+          });
+          setReached(count);
+        };
 
         segments.forEach((segment) => {
           gsap.fromTo(
@@ -125,6 +135,7 @@ export function ProcessScroller({
         setScrubbing(true);
         sync();
         return () => {
+          steps.forEach((step) => delete step.dataset.state);
           setScrubbing(false);
           setReached(total);
         };

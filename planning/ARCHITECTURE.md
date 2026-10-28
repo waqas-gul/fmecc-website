@@ -9,7 +9,7 @@ Code structure, boundaries and contracts for the FMECC site. Read with [MASTER_P
 | Framework | Next.js 16.4.3, App Router, Turbopack (default), React 19.3, TypeScript 5.9 strict |
 | Styling | Tailwind CSS v4 through the `@tailwindcss/turbopack` loader rule in `next.config.ts`; tokens in `src/shared/styles/tokens.css` (approved palette and semantic tokens: DESIGN.md §2) |
 | Output | **Static export** (`output: 'export'`) to `out/`, deployable to any static host |
-| Animation | `gsap` (+ `ScrollTrigger`, `SplitText` — bundled and free in gsap ≥ 3.13) from `@/shared/lib/gsap` for scroll choreography only; the Web Animations API with IntersectionObserver for fade-up reveals (`Reveal`); native `<details>` with CSS for the accordion; CSS transitions for the header; React 19.3 `ViewTransition` for route transitions. `motion` (`motion/react`) stays approved for future layout animation but is currently imported nowhere (WS-6) |
+| Animation | `gsap` (+ `ScrollTrigger`, `SplitText` — bundled and free in gsap ≥ 3.13) from `@/shared/lib/gsap` for scroll choreography only; the Web Animations API with IntersectionObserver for reveals (`Reveal`: fade-up, media-scale, rule-draw); CSS scroll-driven animations (`animation-timeline`, progressive enhancement) for image parallax and process progress rules, so pages without GSAP stay without it; native `<details>` with CSS for the accordion; CSS transitions for the header; React 19.3 `ViewTransition` for the concept card → concept hero morph. `motion` (`motion/react`) stays approved for future layout animation but is currently imported nowhere (WS-6) |
 | 3D | `three`, `@react-three/fiber` (v9, React 19 compatible), `@react-three/drei` (v10), `@types/three` |
 | Icons | `lucide-react` (already in Next's default `optimizePackageImports`) |
 | Images | `next/image` with a custom loader + `scripts/optimize-images.mjs` using `sharp` (present as a Next dependency; declare it explicitly as a devDependency) |
@@ -67,6 +67,8 @@ src/
   widgets/
     site-header/  site-footer/  page-hero/  cta-band/
     home-hero/  home-intro/  services-showcase/  process-section/  featured-projects/  values-section/
+    concept-comparison/        ConceptComparison + ComparisonSlider (Home: concept drawing vs construction stage, illustrative)
+    quote-shortcut/            QuoteShortcut (floating "Get a quote", rendered by the root layout)
     service-detail/            ServiceOverview, ServiceScope, ServiceProcess, DeliveryProcess, ServicePanels, ServiceFaq, RelatedProjects
     service-showcase/          ServiceShowcase + scenes/ (TowerScene, BollardScene, BuildingScene, CoverageDiagram)
     project-detail/            ProjectFacts, ProjectNarrative, ProjectGallery
@@ -90,11 +92,13 @@ src/
                seo/ (metadata.ts, structured-data.ts, JsonLd.tsx, url.ts)
                utils/ (cn.ts, device.ts)
     three/     LazyScene.tsx  useDeviceTier.ts  SceneCanvas.tsx (lazy)  SceneCanvasImpl.tsx  types.ts  (index.ts)
+    motion/    LineReveal.tsx  (index.ts)                       GSAP-powered primitives; importing it adds GSAP to the route
     styles/    tokens.css  base.css
     types/     media.ts  scheme.ts
 scripts/
   optimize-images.mjs
   fix-export-segments.mjs      post-build step of `npm run build` (§10)
+  concept-drawing.mjs          traces the building poster into the comparison's concept drawing (run before `npm run images`)
 media-src/                     original photography (committed or LFS); not served
 public/
   images/brand/logo.png  images/<section>/<name>-<w>.webp  videos/
@@ -160,7 +164,9 @@ export function Eyebrow(props: { index?: number; className?: string; children: R
 export function Card(props: { as?: 'article' | 'div' | 'li'; href?: Route; interactive?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element;
 export function Badge(props: { tone?: 'neutral' | 'accent' | 'brand'; children: React.ReactNode }): React.JSX.Element;
 export function Accordion(props: { items: { id: string; title: string; content: React.ReactNode }[]; defaultOpenId?: string; className?: string }): React.JSX.Element;   // server; native <details>/<summary> with an h3 per question, works without JS, CSS height animation where supported
-export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; IntersectionObserver + Web Animations API (no GSAP); reduced-motion aware; focus inside finishes it
+export type RevealVariant = 'fade-up' | 'media-scale' | 'rule-draw';
+export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; variant?: RevealVariant; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; IntersectionObserver + Web Animations API (no GSAP); reduced-motion aware; focus inside finishes it. media-scale also settles every img inside from scale 1.08 (the `scale` property, so hover zoom and parallax transforms still apply); rule-draw scales X from the element's transform origin
+// SectionHeader reveals its eyebrow, title and lede in sequence (Reveal stagger) when below the fold.
 export function MediaImage(props: Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & { asset: ImageAsset; sizes: string }): React.JSX.Element;
 export function VideoBackground(props: { video: VideoAsset; overlay?: 'none' | 'dark' | 'brand'; preload?: boolean; sizes?: string; desktopOnly?: boolean; className?: string }): React.JSX.Element;  // client; poster fallback, lazy, pause control; `preload` only when the poster is the page's LCP image (heroes); `sizes` (default '100vw') is the poster's rendered width, wider than the box when a 16:9 poster covers a taller box; `desktopOnly` leaves the poster alone below 1024 px (no video element, no requests, no control)
 export function Breadcrumbs(props: { items: { label: string; href?: Route }[]; className?: string }): React.JSX.Element;  // renders BreadcrumbList JSON-LD
@@ -178,6 +184,11 @@ export function ColumnGuides(props: { className?: string }): React.JSX.Element; 
 // Added in WS-6 (one tile instead of eight copies across six widgets):
 export function IconTile(props: { icon: LucideIcon; className?: string }): React.JSX.Element;                          // 40 px tile, 20 px cyan glyph, aria-hidden
 ```
+`src/shared/motion` public API (GSAP-powered; only for routes that already ship GSAP: Home, About):
+```ts
+export function LineReveal(props: { as?: 'h2' | 'h3'; className?: string; children: React.ReactNode }): React.JSX.Element; // client; SplitText line mask reveal below the fold
+```
+CSS utilities in `src/shared/styles/base.css` (scroll-driven, no JavaScript; finished state where unsupported or with reduced motion): `parallax-frame` + `parallax-media` (image drifts ±4 % inside a clipped frame), `rule-scroll-x` / `rule-scroll-y` (progress rule fills as it enters). Never combine `parallax-media` with a GSAP transform on the same image (CSS animations override inline styles).
 `className` on shared components is for layout. To hide one responsively use variant utilities (`max-lg:hidden`), never base display classes such as `hidden`, which lose to the component's own `inline-flex`. Inside `FormField`, controls receive `id`, `aria-describedby`, `aria-invalid` and `required` automatically.
 
 `src/shared/lib` public API:
@@ -282,6 +293,7 @@ export const concepts: readonly ProjectConcept[];
 export function getConcept(slug: string): ProjectConcept | undefined;
 export function conceptNumber(slug: string): number;
 export const conceptNotice: string;                                   // shown wherever concepts appear
+export function conceptMediaTransition(slug: string): string;         // view-transition name shared by a card's media and the concept page hero
 export function ConceptCard(props: { concept: ProjectConcept; variant?: 'default' | 'compact' | 'featured'; className?: string }): React.JSX.Element;  // always labelled "Illustrative concept"
 
 // src/entities/company
@@ -304,7 +316,7 @@ Content rules enforced in data modules: strings that are drafts carry a `// TODO
 // widgets
 export function SiteHeader(props: { variant?: 'overlay' | 'solid' }): React.JSX.Element;
 export function SiteFooter(): React.JSX.Element;
-export function PageHero(props: { eyebrow?: string; index?: number; title: string; lede?: string; media?: ImageAsset | VideoAsset; scheme?: Scheme; breadcrumbs?: { label: string; href?: Route }[]; actions?: React.ReactNode }): React.JSX.Element;
+export function PageHero(props: { eyebrow?: string; index?: number; title: string; lede?: string; media?: ImageAsset | VideoAsset; scheme?: Scheme; breadcrumbs?: { label: string; href?: Route }[]; actions?: React.ReactNode; mediaTransition?: string }): React.JSX.Element;  // mediaTransition: ViewTransition name of the media frame (share="morph")
 export function CtaBand(props: { title?: string; description?: string; primary?: { label: string; href: Route }; scheme?: Scheme }): React.JSX.Element;   // defaults to the quote CTA + contact channels
 export function HomeHero(): React.JSX.Element;
 export function HomeIntro(): React.JSX.Element;
@@ -312,6 +324,8 @@ export function ServicesShowcase(): React.JSX.Element;                          
 export function ProcessSection(props: { steps: CompanyContent['process']; scene?: SceneLoader; poster?: ImageAsset; scheme?: Scheme }): React.JSX.Element;
 export function FeaturedProjects(props: { projects: Project[]; concepts?: readonly ProjectConcept[] }): React.JSX.Element;  // real projects win; else the labelled concepts; else nothing
 export function ValuesSection(props: { values: CompanyContent['values'] }): React.JSX.Element;
+export function ConceptComparison(props: { render: ImageAsset }): React.JSX.Element;         // Home; render = showcaseScenes.building.poster, compared with the concept drawing traced from it; labelled illustrative
+export function QuoteShortcut(): React.JSX.Element;                                          // client, root layout; floating quote link after the first viewport, hidden over #next-step (CtaBand) and #site-footer and on /contact/; preselects the service on service pages
 export function ServiceOverview(props: { service: Service }): React.JSX.Element;
 export function ServiceScope(props: { service: Service }): React.JSX.Element;
 export function ServiceProcess(props: { service: Service }): React.JSX.Element;
@@ -323,12 +337,12 @@ export function ServiceFaq(props: { service: Service }): React.JSX.Element;
 export function RelatedProjects(props: { service: Service; projects: Project[] }): React.JSX.Element;
 export function ProjectFacts(props: { project: Project }): React.JSX.Element;
 export function ProjectNarrative(props: { project: Project }): React.JSX.Element;
-export function ProjectGallery(props: { images: ImageAsset[]; title?: string; lede?: string }): React.JSX.Element;  // title defaults to 'Project gallery'
+export function ProjectGallery(props: { images: ImageAsset[]; title?: string; lede?: string; label?: string }): React.JSX.Element;  // title defaults to 'Project gallery'; label is printed on every image (concepts: "Illustrative concept")
 export function ContactPanel(): React.JSX.Element;
 // features
 export function QuoteRequestForm(props: { defaultService?: ServiceSlug; id?: string }): React.JSX.Element;   // client; reads ?service= inside Suspense
 export function ContactChannels(props: { layout: 'inline' | 'stack' | 'grid'; className?: string }): React.JSX.Element;   // server; omits null channels
-export function ProjectFilter(props: { projects: Project[] }): React.JSX.Element;            // client; chips + grid + URL sync
+export function ProjectFilter(props: { projects: Project[]; concepts?: readonly ProjectConcept[] }): React.JSX.Element;  // client; chips + grid + URL sync; real projects win, else the concepts, else "portfolio in progress"
 ```
 
 ## 9. Routing approach
@@ -338,7 +352,7 @@ export function ProjectFilter(props: { projects: Project[] }): React.JSX.Element
 - Export fails when a dynamic segment generates no params, so while `projects` is empty the detail page lives in the private folder `projects/_detail/` (linted and type-checked, not routed). Adding the first verified project requires `git mv src/app/projects/_detail "src/app/projects/[slug]"`; the `/projects/` build check (`projects/_lib/check-portfolio.ts`) stops the build until that is done.
 - `typedRoutes: true`: all `href`s are typed; `routes.*` helpers are the only place route strings are built.
 - Metadata: `app/layout.tsx` sets `metadataBase`, default title/template, Open Graph defaults; pages call `buildMetadata()`.
-- Route transitions: wrap `{children}` in `app/layout.tsx` with React 19.3 `<ViewTransition default="none">` and give page roots a short cross-fade class; scroll resets to top on navigation (default behaviour).
+- Route transitions: named React 19.3 `<ViewTransition share="morph" default="none">` pairs only (concept card media ↔ concept page hero, `conceptMediaTransition(slug)`); other navigations swap instantly. CSS in `base.css` styles the morph and turns it off with reduced motion. Scroll resets to top on navigation (default behaviour).
 - Query-driven UI (`?service=`) is client-only behind `<Suspense>`; the server-rendered default state must be correct without the query.
 - No route handlers, server actions, middleware/proxy, redirects, rewrites or headers (unsupported in export mode).
 
@@ -382,7 +396,7 @@ Checklist
 | Images | Originals in `media-src/`; `npm run images` writes `public/images/**/<name>-<w>.webp` for widths 320, 480, 640, 960, 1280, 1600, 1920 (no enlargement) plus `<name>.webp` at the largest size. `MediaImage` requires `sizes`; only the page's LCP image sets `preload`; all others lazy-load (default) |
 | Video | `VideoBackground`: `preload="none"`, sources attached when within one viewport, `prefers-reduced-motion: no-preference` and Save-Data off (and from 1024 px with `desktopOnly`, as on Home); paused off-screen; poster always rendered first |
 | 3D | `LazyScene` dynamic-imports a scene module (its own chunk) on approach; three, R3F and Drei are therefore never in the initial bundle. One canvas per page; `frameloop="demand"`; dispose on unmount |
-| GSAP | ScrollTrigger registered once in `shared/lib/gsap/gsap.ts`; client components import from `@/shared/lib/gsap` only, so GSAP ships only on routes that use it: Home, About (process scrub). Reveals use the Web Animations API, so the services overview and the four service pages ship no GSAP. `ScrollTrigger.refresh()` after `document.fonts.ready` and on image load inside pinned sections |
+| GSAP | ScrollTrigger registered once in `shared/lib/gsap/gsap.ts`; client components import from `@/shared/lib/gsap` only, so GSAP ships only on routes that use it: Home, About (process scrub, plus SplitText for the statement's `LineReveal`). Reveals use the Web Animations API, so the services overview and the four service pages ship no GSAP. `ScrollTrigger.refresh()` after `document.fonts.ready` and on image load inside pinned sections |
 | Motion | Not imported anywhere since WS-6: the FAQ accordion is native `<details>` with CSS, and the project filter needs no layout animation. If a future component needs layout animation, use `motion/react` with `LazyMotion` + `m` in that component only. The header uses CSS transitions and `@starting-style` |
 | Icons | Named imports from `lucide-react` |
 | Scripts | None by default; analytics via `next/script` `afterInteractive` only when `NEXT_PUBLIC_ANALYTICS_ID` is set |

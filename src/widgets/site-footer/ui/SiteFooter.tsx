@@ -15,7 +15,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer data-scheme="brand" className="relative overflow-hidden border-t border-line bg-surface text-ink">
+    <footer id="site-footer" data-scheme="brand" className="relative overflow-hidden border-t border-line bg-surface text-ink">
       <ColumnGuides />
       <p
         aria-hidden

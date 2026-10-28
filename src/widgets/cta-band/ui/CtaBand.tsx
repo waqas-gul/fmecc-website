@@ -22,7 +22,8 @@ export function CtaBand({
   scheme?: Scheme;
 }) {
   return (
-    <Section scheme={scheme} guides container={false}>
+    // `next-step` also lets the floating quote shortcut step aside while this band is on screen.
+    <Section id="next-step" scheme={scheme} guides container={false}>
       {/* Spectrum rule along the top edge (planning/DESIGN.md §2.4). */}
       <span aria-hidden className="spectrum-fill absolute inset-x-0 top-0 h-0.5" />
       <Container className="relative grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-8">

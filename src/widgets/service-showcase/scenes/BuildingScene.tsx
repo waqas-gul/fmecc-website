@@ -18,7 +18,7 @@ import { SceneCanvas, type SceneProps } from "@/shared/three";
 
 import { BUILDING_FLOORS, buildingTimeline, floorStart, PODIUM_FLOORS } from "../model/timelines";
 import { SCENE_FRAME_MASK } from "./lib/frame";
-import { ease, lerp, span } from "./lib/math";
+import { ease, lerp, settle, span } from "./lib/math";
 import { cross, dashed, Gauge, GroundMarks, line, type Mark } from "./lib/overlays";
 import { palette } from "./lib/palette";
 import { Grow, Members, type Member, type Vec3 } from "./lib/progressive";
@@ -334,15 +334,17 @@ function Building({ progress, active, tier, reducedMotion }: SceneProps) {
   });
 
   // Opens looking down on the setting-out, then descends to a slight low angle as floors rise.
+  // On first draw the camera settles in from slightly wider and higher (drive.intro).
   useFrame(({ camera, size: view }) => {
-    const { progress: p, pointerX, pointerY } = drive.current;
+    const { progress: p, pointerX, pointerY, intro } = drive.current;
     const t = ease(span(p, 0, 0.9));
+    const entrance = settle(intro);
     const fit = Math.max(1, 0.8 / (view.width / view.height));
-    const distance = lerp(46, 82, t) * fit;
-    const azimuth = MathUtils.degToRad(lerp(42, 32, t) + pointerX * 4);
+    const distance = lerp(46, 82, t) * fit * (1 + 0.14 * entrance);
+    const azimuth = MathUtils.degToRad(lerp(42, 32, t) + pointerX * 4 + 9 * entrance);
     camera.position.set(
       Math.sin(azimuth) * distance + 2,
-      lerp(30, 9, t) - pointerY * 1.5,
+      lerp(30, 9, t) - pointerY * 1.5 + 5 * entrance,
       Math.cos(azimuth) * distance,
     );
     camera.lookAt(lerp(1, 2.5, t), lerp(3, 20, t), 0);

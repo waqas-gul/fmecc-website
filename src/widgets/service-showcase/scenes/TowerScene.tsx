@@ -13,7 +13,7 @@ import {
   towerTimeline,
 } from "../model/timelines";
 import { SCENE_FRAME_MASK } from "./lib/frame";
-import { ease, lerp, span } from "./lib/math";
+import { ease, lerp, settle, span } from "./lib/math";
 import { cross, dashed, Gauge, GroundMarks, line } from "./lib/overlays";
 import { palette } from "./lib/palette";
 import { Grow, Members, type Member, type Vec3 } from "./lib/progressive";
@@ -261,14 +261,20 @@ function Tower({ progress, active, tier, reducedMotion }: SceneProps) {
   const segments = tier === "high" ? 8 : 6;
 
   // Camera work: opens looking down on the setting-out, then descends to a slight low angle and
-  // pulls back as the tower rises. Stable horizon; the mouse adds at most 4° of orbit.
+  // pulls back as the tower rises. Stable horizon; the mouse adds at most 4° of orbit. On first
+  // draw the camera settles in from slightly wider and higher (drive.intro).
   useFrame(({ camera, size }) => {
-    const { progress: p, pointerX, pointerY } = drive.current;
+    const { progress: p, pointerX, pointerY, intro } = drive.current;
     const t = ease(span(p, 0, 0.85));
+    const entrance = settle(intro);
     const fit = Math.max(1, 0.8 / (size.width / size.height));
-    const distance = lerp(26, 55, t) * fit;
-    const azimuth = MathUtils.degToRad(lerp(50, 36, t) + pointerX * 4);
-    camera.position.set(Math.sin(azimuth) * distance, lerp(13, 6.5, t) - pointerY * 1.2, Math.cos(azimuth) * distance);
+    const distance = lerp(26, 55, t) * fit * (1 + 0.14 * entrance);
+    const azimuth = MathUtils.degToRad(lerp(50, 36, t) + pointerX * 4 + 9 * entrance);
+    camera.position.set(
+      Math.sin(azimuth) * distance,
+      lerp(13, 6.5, t) - pointerY * 1.2 + 3 * entrance,
+      Math.cos(azimuth) * distance,
+    );
     camera.lookAt(0, lerp(0.5, 15.6, t), 0);
   });
 

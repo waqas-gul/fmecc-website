@@ -4,6 +4,7 @@ import { Geist_Mono, Inter, Manrope } from "next/font/google";
 import { site } from "@/shared/config";
 import { JsonLd, organizationJsonLd } from "@/shared/lib/seo";
 import { SkipLink } from "@/shared/ui";
+import { QuoteShortcut } from "@/widgets/quote-shortcut";
 import { SiteFooter } from "@/widgets/site-footer";
 import { SiteHeader } from "@/widgets/site-header";
 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <SiteFooter />
+        <QuoteShortcut />
         <JsonLd data={organizationJsonLd()} />
       </body>
     </html>

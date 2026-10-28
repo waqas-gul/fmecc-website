@@ -2,8 +2,8 @@ import { Info } from "lucide-react";
 
 import { routes } from "@/shared/config";
 import { buildMetadata } from "@/shared/lib/seo";
-import { Reveal, Section, SectionHeader } from "@/shared/ui";
-import { ConceptCard, conceptNotice, concepts } from "@/entities/concept";
+import { Section, SectionHeader } from "@/shared/ui";
+import { conceptNotice, concepts } from "@/entities/concept";
 import { projects } from "@/entities/project";
 import { ProjectFilter } from "@/features/project-filter";
 import { CtaBand } from "@/widgets/cta-band";
@@ -52,13 +52,10 @@ export default function ProjectsPage() {
             <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-highlight" />
             {conceptNotice}
           </p>
-          <ul className="mt-12 grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:mt-16 lg:gap-x-8 lg:gap-y-20">
-            {concepts.map((concept, index) => (
-              <Reveal as="li" key={concept.slug} delay={(index % 2) * 0.08} className="flex">
-                <ConceptCard concept={concept} className="flex-1" />
-              </Reveal>
-            ))}
-          </ul>
+          {/* The same browser as real projects: chips by service, mirrored in ?service=. */}
+          <div className="mt-12 lg:mt-16">
+            <ProjectFilter projects={[]} concepts={concepts} />
+          </div>
         </Section>
       ) : (
         <Section container={hasProjects ? "wide" : "content"}>

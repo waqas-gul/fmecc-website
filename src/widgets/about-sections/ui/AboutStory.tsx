@@ -1,11 +1,12 @@
+import { LineReveal } from "@/shared/motion";
+import { Eyebrow, Reveal, Section, Stat } from "@/shared/ui";
 import type { CompanyContent } from "@/entities/company";
-import { Section, SectionHeader, Stat } from "@/shared/ui";
 
 import { aboutContent } from "../data/about";
 
 /**
  * Company introduction (planning/DESIGN.md §9.3): statement, description and mission, plus figures
- * only when FMECC supplies them.
+ * only when FMECC supplies them. The statement rises line by line, like Home's introduction.
  */
 export function AboutStory({
   statement,
@@ -21,8 +22,11 @@ export function AboutStory({
   return (
     <Section id="who-we-are" scheme="light">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-        <SectionHeader eyebrow={eyebrow} title={statement} className="lg:col-span-6" />
-        <div className="flex flex-col gap-6 lg:col-span-5 lg:col-start-8 lg:pt-12">
+        <div className="lg:col-span-6">
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <LineReveal className="mt-5 max-w-[20ch] font-display text-display-lg font-bold">{statement}</LineReveal>
+        </div>
+        <Reveal stagger={0.08} className="flex flex-col gap-6 lg:col-span-5 lg:col-start-8 lg:pt-12">
           {[...intro, ...paragraphs].map((paragraph, index) => (
             <p key={index} className={index === 0 ? "text-body-lg text-ink" : "text-body text-ink-muted"}>
               {paragraph}
@@ -32,7 +36,7 @@ export function AboutStory({
             <h3 className="type-label text-highlight">{missionLabel}</h3>
             <p className="mt-5 max-w-[32ch] font-display text-heading-md font-semibold text-ink">{mission}</p>
           </div>
-        </div>
+        </Reveal>
       </div>
 
       {stats.length > 0 && (

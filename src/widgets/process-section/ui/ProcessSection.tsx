@@ -43,30 +43,44 @@ export function ProcessSection({
         // With a scene, the pinned frame's header band is the top spacing below 1024 px.
         className={scene ? "lg:mt-20" : "mt-14 lg:mt-20"}
       >
+        {/* Each step carries `data-state` (done, current, upcoming) while the scroller tracks it;
+            without it, as in the prerendered HTML or with reduced motion, every step reads as complete. */}
         <ol data-animate="process-list" className="relative">
           {steps.map((step, index) => (
-            <li key={step.title} className="relative grid grid-cols-[15px_1fr] gap-x-6 pb-10 last:pb-0 lg:gap-x-8 lg:pb-12">
+            <li
+              key={step.title}
+              data-animate="process-step"
+              className="group/step relative grid grid-cols-[2.25rem_1fr] gap-x-5 pb-10 last:pb-0 lg:gap-x-7 lg:pb-12"
+            >
               {/* Rail segment from this node to the next; its inner span is the scrubbed fill. */}
               {index < steps.length - 1 && (
                 <span
                   aria-hidden
                   data-animate="process-segment"
-                  className="absolute top-[7px] bottom-0 left-[7px] w-px bg-line"
+                  className="absolute top-[1.125rem] bottom-0 left-[1.125rem] w-px -translate-x-1/2 bg-line"
                 >
                   <span className="absolute inset-0 origin-top bg-highlight" />
                 </span>
               )}
+              {/* Numbered node: the cyan ring lights as the step is reached; the halo marks the current step. */}
               <span
                 aria-hidden
                 data-animate="process-node"
-                className="relative -mt-0.5 size-[15px] rounded-full border border-line-strong bg-surface"
+                className="relative grid size-9 place-items-center rounded-full border border-line-strong bg-surface"
               >
-                <span className="absolute inset-[3px] rounded-full bg-highlight" />
+                <span className="absolute inset-[-1px] rounded-full border border-highlight" />
+                <span className="absolute -inset-1.5 rounded-full bg-highlight/15 opacity-0 transition-opacity duration-250 group-data-[state=current]/step:opacity-100" />
+                <span className="type-label relative text-highlight tabular-nums transition-colors duration-250 group-data-[state=upcoming]/step:text-ink-subtle">
+                  {pad(index + 1)}
+                </span>
               </span>
-              <div>
-                <span className="type-label text-highlight tabular-nums">{pad(index + 1)}</span>
-                <h3 className="mt-3 font-display text-heading-sm font-semibold">{step.title}</h3>
-                <p className="mt-2 max-w-[48ch] text-ink-muted">{step.description}</p>
+              <div className="pt-1.5">
+                <h3 className="font-display text-heading-sm font-semibold transition-colors duration-250 group-data-[state=done]/step:text-ink-muted group-data-[state=upcoming]/step:text-ink-subtle">
+                  {step.title}
+                </h3>
+                <p className="mt-2 max-w-[48ch] text-ink-muted transition-colors duration-250 group-data-[state=upcoming]/step:text-ink-subtle">
+                  {step.description}
+                </p>
               </div>
             </li>
           ))}

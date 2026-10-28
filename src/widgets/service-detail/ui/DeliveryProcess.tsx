@@ -11,7 +11,9 @@ const columnClasses: Record<number, string> = {
 
 /**
  * Numbered delivery steps on the dark scheme (planning/DESIGN.md §9.1, step 4): a vertical rule
- * with cyan nodes below 1024 px, a horizontal rule above it. Steps reveal as they scroll in.
+ * with cyan nodes below 1024 px, a horizontal rule above it. Steps reveal as they scroll in, and a
+ * cyan progress rule fills along each step's rule with the scroll (CSS scroll-driven; static where
+ * unsupported or with reduced motion).
  * Used by `ServiceProcess` and, with the shared company process, by the services overview page.
  */
 export function DeliveryProcess({
@@ -44,6 +46,11 @@ export function DeliveryProcess({
             delay={index * 0.08}
             className="relative border-l border-line pb-10 pl-8 last:pb-0 lg:border-t lg:border-l-0 lg:pt-8 lg:pr-6 lg:pb-0 lg:pl-0"
           >
+            {/* Progress rule over the step's own rule: fills as the step scrolls in (CSS only). */}
+            <span
+              aria-hidden
+              className="absolute top-0 bottom-0 -left-px w-px bg-highlight max-lg:rule-scroll-y lg:-top-px lg:right-0 lg:bottom-auto lg:left-0 lg:h-px lg:w-auto lg:rule-scroll-x"
+            />
             <span
               aria-hidden
               className="absolute top-1 -left-[4.5px] size-2 rounded-full bg-highlight lg:-top-[4.5px] lg:left-0"

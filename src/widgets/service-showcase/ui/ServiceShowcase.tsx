@@ -39,6 +39,7 @@ export function ServiceShowcase({ service }: { service: Service }) {
         poster={scene.poster}
         label={scene.label}
         caption={content.caption}
+        hint={content.hint}
         stages={content.stages}
       />
     </Section>

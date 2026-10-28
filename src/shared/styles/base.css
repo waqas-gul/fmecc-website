@@ -215,3 +215,104 @@
   background-clip: text;
   color: transparent;
 }
+
+/*
+ * Scroll-linked motion with CSS scroll-driven animations (DESIGN.md §10.4): no JavaScript, so pages
+ * without GSAP keep shipping none. Where the browser lacks support, or with reduced motion, every
+ * element rests in its finished state.
+ *
+ * Parallax: `parallax-frame` on an overflow-hidden media frame, `parallax-media` on the image; the
+ * image drifts 4 % against the scroll while the frame crosses the viewport.
+ */
+@utility parallax-frame {
+  view-timeline: --parallax block;
+}
+
+@utility parallax-media {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: parallax-media linear both;
+      animation-timeline: --parallax;
+      animation-range: cover;
+    }
+  }
+}
+
+/* Progress rules that fill as their step enters the viewport: horizontal (`-x`) or vertical (`-y`). */
+@utility rule-scroll-x {
+  transform-origin: left;
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: rule-scroll-x linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+}
+
+@utility rule-scroll-y {
+  transform-origin: top;
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: rule-scroll-y linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+}
+
+@keyframes parallax-media {
+  from {
+    transform: translateY(-4%) scale(1.1);
+  }
+  to {
+    transform: translateY(4%) scale(1.1);
+  }
+}
+
+@keyframes rule-scroll-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes rule-scroll-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+/*
+ * Route view transitions (React <ViewTransition>, ARCHITECTURE.md §9): a concept card's media
+ * morphs into the concept page hero (`share="morph"`). Snapshots cover the moving frame so the
+ * 4:3 card and the 16:9 hero blend without stretching. Clicks pass through to the live page, and
+ * reduced motion swaps instantly.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-image-pair(.morph) {
+  overflow: clip;
+  border-radius: var(--radius-md);
+}
+
+::view-transition-old(.morph),
+::view-transition-new(.morph) {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

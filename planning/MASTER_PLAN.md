@@ -28,7 +28,7 @@ Out of scope for v1: CMS, authentication, blog/news, careers portal, Arabic loca
 | Procurement and prequalification teams | Company profile, scope, registrations, contacts | About → Projects → Contact | Email |
 
 Journey rules:
-- Every page reaches a quotation CTA within one tap (header button on desktop, sticky CTA on mobile).
+- Every page reaches a quotation CTA within one tap (header button, plus the floating "Get a quote" shortcut once the visitor scrolls; it preselects the service on service pages).
 - A service page answers, in order: what we do → who it is for → how we deliver → proof → next step.
 - Contact channels are visible without scrolling on the contact page at phone width.
 - Service pages deep-link to the quote form with the service preselected: `/contact/?service=<slug>`.
@@ -99,9 +99,10 @@ Content requirements per service. Scope items are **candidate** items for FMECC 
 | 3 | Services showcase | Present the four services with strong media | Sticky scroll switcher on desktop, stacked cards on mobile; each links to its page |
 | 4 | How we deliver | Process steps with a signature visual | Scroll-scrubbed step timeline; 3D tower scene (lazy, poster fallback) or gallery |
 | 5 | Featured projects | Proof | Horizontal gallery on desktop, swipe carousel on mobile; links to `/projects/` |
-| 6 | Why FMECC | Principles: safety, quality, schedule, compliance | Generic principles, no unverifiable claims |
-| 7 | CTA band | Convert | "Request a quotation" plus phone / WhatsApp / email |
-| 8 | Footer | Navigation and contact | Shared widget |
+| 6 | From concept to construction | Show how a design becomes a structure | Comparison slider built from the project-owned building model; labelled as an illustration, never as before/after project photography |
+| 7 | Why FMECC | Principles: safety, quality, coordinated delivery, engineering focus | Generic principles, no unverifiable claims |
+| 8 | CTA band | Convert | "Request a quotation" plus phone / WhatsApp / email |
+| 9 | Footer | Navigation and contact | Shared widget |
 
 ## 6. Project portfolio requirements
 

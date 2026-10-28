@@ -2,12 +2,12 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { routes } from "@/shared/config";
+import { LineReveal } from "@/shared/motion";
 import { Eyebrow, LinkButton, Reveal, Section, Stat } from "@/shared/ui";
 import { company } from "@/entities/company";
 import { services } from "@/entities/service";
 
 import { introContent } from "../data/content";
-import { LineReveal } from "./LineReveal";
 
 const pad = (value: number) => String(value).padStart(2, "0");
 

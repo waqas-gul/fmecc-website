@@ -18,7 +18,7 @@ export { Eyebrow } from "./Eyebrow";
 export { Checkbox, FormField, Input, Select, Textarea } from "./Form";
 export { IconTile } from "./IconTile";
 export { MediaImage, type MediaImageProps } from "./MediaImage";
-export { Reveal } from "./Reveal";
+export { Reveal, type RevealVariant } from "./Reveal";
 export { Section } from "./Section";
 export { SectionHeader } from "./SectionHeader";
 export { SkipLink } from "./SkipLink";

@@ -19,7 +19,8 @@ interface ShowcaseText {
 }
 
 export type ShowcaseContent =
-  | (ShowcaseText & { kind: "scene"; scene: SceneKey; stages: ShowcaseStage[] })
+  /** `hint`: short instruction shown on the visual until the visitor starts scrolling. */
+  | (ShowcaseText & { kind: "scene"; scene: SceneKey; stages: ShowcaseStage[]; hint: string })
   | (ShowcaseText & { kind: "diagram" });
 
 const ILLUSTRATIVE = "Illustrative model. It does not depict a specific FMECC project.";
@@ -35,6 +36,7 @@ export const showcases: Partial<Record<ShowcaseKey, ShowcaseContent>> = {
     title: "From setting-out to the antenna platform",
     lede: "Scroll to follow an illustrative self-supporting lattice tower from marked leg positions to a fitted antenna platform.",
     caption: ILLUSTRATIVE,
+    hint: "Scroll to erect the tower",
     stages: [
       { title: "Setting out", description: "Leg positions and the compound boundary are marked on the cleared site.", at: towerTimeline.setOut[0] },
       { title: "Foundations", description: "Concrete pads are cast for each leg, and the fence and equipment shelter go in.", at: towerTimeline.foundations[0] + 0.02 },
@@ -50,6 +52,7 @@ export const showcases: Partial<Record<ShowcaseKey, ShowcaseContent>> = {
     title: "Floor by floor, from raft to roof",
     lede: "An illustrative massing model of the construction sequence: the core leads, the frame follows and the façade closes in behind.",
     caption: ILLUSTRATIVE,
+    hint: "Scroll to build it floor by floor",
     stages: [
       { title: "Setting out", description: "Grid lines and the building outline are marked on site.", at: buildingTimeline.setOut[0] },
       { title: "Foundation raft", description: "A concrete raft is cast across the footprint.", at: buildingTimeline.raft[0] },
@@ -66,6 +69,7 @@ export const showcases: Partial<Record<ShowcaseKey, ShowcaseContent>> = {
     title: "Flush with the ground until it is needed",
     lede: "An illustrative cutaway of automatic hydraulic bollards: each one rises from its below-ground housing on a hydraulic ram and retracts flush with the paving.",
     caption: ILLUSTRATIVE,
+    hint: "Scroll to raise the bollards, back to lower them",
     stages: [
       { title: "Retracted", description: "The bollards sit flush with the paving, so vehicles pass over them.", at: 0 },
       { title: "Rising", description: "Hydraulic rams lift each bollard from its housing in sequence.", at: bollardTimeline.rise[0] },

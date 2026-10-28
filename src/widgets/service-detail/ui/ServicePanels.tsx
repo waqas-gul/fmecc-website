@@ -9,6 +9,8 @@ import { Eyebrow, LinkButton, MediaImage, Reveal, Section } from "@/shared/ui";
  * Services overview (planning/DESIGN.md §9.3): one large panel per service, media alternating
  * left and right from 1024 px, stacked with media first below. Each panel lists the scope so
  * the four services can be compared, and links to the service page and its quotation request.
+ * Panels rise in as they enter while the image settles from a slight zoom, then drifts gently
+ * against the scroll (CSS parallax, no JavaScript).
  */
 export function ServicePanels({ services }: { services: readonly Service[] }) {
   return (
@@ -17,11 +19,11 @@ export function ServicePanels({ services }: { services: readonly Service[] }) {
         {services.map((service, index) => {
           const reverse = index % 2 === 1;
           return (
-            <Reveal key={service.slug}>
+            <Reveal key={service.slug} variant="media-scale">
               <article aria-labelledby={`service-${service.slug}`} className="grid gap-8 lg:grid-cols-12 lg:items-center">
                 <div
                   className={cn(
-                    "relative aspect-[4/3] overflow-hidden rounded-md lg:col-span-5 lg:row-start-1 lg:aspect-[4/5]",
+                    "parallax-frame relative aspect-[4/3] overflow-hidden rounded-md lg:col-span-5 lg:row-start-1 lg:aspect-[4/5]",
                     reverse ? "lg:col-start-8" : "lg:col-start-1",
                   )}
                 >
@@ -29,7 +31,7 @@ export function ServicePanels({ services }: { services: readonly Service[] }) {
                     asset={service.showcaseMedia}
                     fill
                     sizes="(min-width: 1024px) 40vw, 100vw"
-                    className="object-cover"
+                    className="parallax-media object-cover"
                   />
                 </div>
 

@@ -31,12 +31,12 @@ export function ServiceCard({
     >
       {variant === "default" ? (
         // The frame sets the 4:3 crop so real images and placeholder panels match.
-        <div className="relative aspect-[4/3] overflow-hidden rounded-t-md">
+        <div className="parallax-frame relative aspect-[4/3] overflow-hidden rounded-t-md">
           <MediaImage
             asset={service.hero}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-600 ease-out-expo motion-safe:group-hover:scale-[1.04]"
+            className="parallax-media object-cover transition-[scale] duration-600 ease-out-expo motion-safe:group-hover:scale-[1.04]"
           />
         </div>
       ) : (

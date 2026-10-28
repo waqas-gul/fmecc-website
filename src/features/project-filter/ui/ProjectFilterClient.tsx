@@ -4,9 +4,8 @@ import { useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import type { ServiceSlug } from "@/shared/config";
-import type { Project } from "@/entities/project";
 
-import { parseService, SERVICE_PARAM, type ServiceOption } from "../lib/filter";
+import { parseService, SERVICE_PARAM, type Portfolio, type ServiceOption } from "../lib/filter";
 import { ProjectFilterView } from "./ProjectFilterView";
 
 /**
@@ -14,7 +13,7 @@ import { ProjectFilterView } from "./ProjectFilterView";
  * through history.replaceState, which Next syncs into useSearchParams without a server round trip
  * and without adding a history entry per click.
  */
-export function ProjectFilterClient({ projects, options }: { projects: Project[]; options: ServiceOption[] }) {
+export function ProjectFilterClient({ portfolio, options }: { portfolio: Portfolio; options: ServiceOption[] }) {
   const searchParams = useSearchParams();
   const active = parseService(searchParams.get(SERVICE_PARAM));
   const [animate, setAnimate] = useState(false);
@@ -37,7 +36,7 @@ export function ProjectFilterClient({ projects, options }: { projects: Project[]
 
   return (
     <ProjectFilterView
-      projects={projects}
+      portfolio={portfolio}
       options={options}
       active={active}
       animate={animate}
