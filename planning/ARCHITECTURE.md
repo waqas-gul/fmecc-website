@@ -299,6 +299,7 @@ export function ServiceOverview(props: { service: Service }): React.JSX.Element;
 export function ServiceScope(props: { service: Service }): React.JSX.Element;
 export function ServiceProcess(props: { service: Service }): React.JSX.Element;
 export function ServiceShowcase(props: { service: Service }): React.JSX.Element;            // maps service.showcase → scene / diagram / gallery
+export const showcaseScenes: Record<'tower' | 'building' | 'bollard', { load: SceneLoader; poster: ImageAsset; label: string }>;  // widgets/service-showcase (WS-5): feeds any LazyScene slot, e.g. Home's ProcessSection; `load` is a client reference
 export function ServiceFaq(props: { service: Service }): React.JSX.Element;
 export function RelatedProjects(props: { service: Service; projects: Project[] }): React.JSX.Element;
 export function ProjectFacts(props: { project: Project }): React.JSX.Element;
