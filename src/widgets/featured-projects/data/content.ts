@@ -5,3 +5,11 @@ export const featuredContent = {
   allProjects: "All projects",
   galleryLabel: "Featured projects gallery",
 } as const;
+
+// Shown instead while there are no real projects: illustrative concepts from entities/concept.
+export const conceptContent = {
+  eyebrow: "Project concepts",
+  title: "Featured concepts.",
+  allProjects: "All concepts",
+  galleryLabel: "Illustrative project concepts",
+} as const;

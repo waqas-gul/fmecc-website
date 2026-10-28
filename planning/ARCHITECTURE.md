@@ -62,6 +62,7 @@ src/
     services/[slug]/page.tsx   generateStaticParams from entities/service
     projects/page.tsx
     projects/_detail/page.tsx  dormant /projects/[slug]: `git mv` to [slug]/ when the first verified project exists
+    projects/concepts/[slug]/page.tsx  illustrative concept detail (noindex, not in the sitemap); generateStaticParams from entities/concept
     contact/page.tsx
   widgets/
     site-header/  site-footer/  page-hero/  cta-band/
@@ -76,6 +77,7 @@ src/
   entities/
     service/   model/types.ts  model/registry.ts  data/<slug>.ts (×4)  ui/ServiceCard.tsx  index.ts
     project/   model/types.ts  model/registry.ts  data/projects.ts     ui/ProjectCard.tsx  index.ts
+    concept/   model/types.ts  model/registry.ts  data/concepts.ts     ui/ConceptCard.tsx  index.ts   (illustrative concepts, shown only without real projects)
     company/   model/types.ts  data/company.ts  index.ts
   shared/
     ui/        Button, LinkButton, Container, Section, SectionHeader, Eyebrow, Card, Badge, Accordion,
@@ -233,6 +235,7 @@ export const brandLogo: BrandLogoAsset | null;                        // from br
 export const routes: {                                                // every value is a typed `Route`
   home; about; services; projects; contact;                           // '/', '/about', '/services', '/projects', '/contact'
   service: (slug: ServiceSlug) => Route; project: (slug: string) => Route;
+  concept: (slug: string) => Route;                                   // '/projects/concepts/<slug>'
   quote: (service?: ServiceSlug) => Route;                            // '/contact?service=<slug>#quote', rendered with the trailing slash
 };
 ```
@@ -273,6 +276,14 @@ export function getProjectsByService(slug: ServiceSlug, limit?: number): Project
 export function getFeaturedProjects(limit?: number): Project[];
 export function ProjectCard(props: { project: Project; variant?: 'default' | 'featured'; className?: string }): React.JSX.Element;
 
+// src/entities/concept: ILLUSTRATIVE concepts for client preview, never delivered work (no client, location or date)
+export interface ProjectConcept { slug: string; title: string; service: ServiceSlug; summary: string; overview: string[]; scope: string[]; hero: ImageAsset; gallery: ImageAsset[] }
+export const concepts: readonly ProjectConcept[];
+export function getConcept(slug: string): ProjectConcept | undefined;
+export function conceptNumber(slug: string): number;
+export const conceptNotice: string;                                   // shown wherever concepts appear
+export function ConceptCard(props: { concept: ProjectConcept; variant?: 'default' | 'compact' | 'featured'; className?: string }): React.JSX.Element;  // always labelled "Illustrative concept"
+
 // src/entities/company
 export interface CompanyContent {
   intro: string[]; statement: string;
@@ -299,7 +310,7 @@ export function HomeHero(): React.JSX.Element;
 export function HomeIntro(): React.JSX.Element;
 export function ServicesShowcase(): React.JSX.Element;                                       // Home only; the overview page uses ServicePanels (one implementation per layout)
 export function ProcessSection(props: { steps: CompanyContent['process']; scene?: SceneLoader; poster?: ImageAsset; scheme?: Scheme }): React.JSX.Element;
-export function FeaturedProjects(props: { projects: Project[] }): React.JSX.Element;         // renders nothing when empty
+export function FeaturedProjects(props: { projects: Project[]; concepts?: readonly ProjectConcept[] }): React.JSX.Element;  // real projects win; else the labelled concepts; else nothing
 export function ValuesSection(props: { values: CompanyContent['values'] }): React.JSX.Element;
 export function ServiceOverview(props: { service: Service }): React.JSX.Element;
 export function ServiceScope(props: { service: Service }): React.JSX.Element;
@@ -312,7 +323,7 @@ export function ServiceFaq(props: { service: Service }): React.JSX.Element;
 export function RelatedProjects(props: { service: Service; projects: Project[] }): React.JSX.Element;
 export function ProjectFacts(props: { project: Project }): React.JSX.Element;
 export function ProjectNarrative(props: { project: Project }): React.JSX.Element;
-export function ProjectGallery(props: { images: ImageAsset[] }): React.JSX.Element;
+export function ProjectGallery(props: { images: ImageAsset[]; title?: string; lede?: string }): React.JSX.Element;  // title defaults to 'Project gallery'
 export function ContactPanel(): React.JSX.Element;
 // features
 export function QuoteRequestForm(props: { defaultService?: ServiceSlug; id?: string }): React.JSX.Element;   // client; reads ?service= inside Suspense

@@ -22,5 +22,6 @@ export const routes = {
   contact: route("/contact"),
   service: (slug: ServiceSlug) => route(`/services/${slug}`),
   project: (slug: string) => route(`/projects/${slug}`),
+  concept: (slug: string) => route(`/projects/concepts/${slug}`),
   quote: (service?: ServiceSlug) => route(service ? `/contact?service=${service}#quote` : "/contact#quote"),
 };

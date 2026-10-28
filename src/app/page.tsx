@@ -1,6 +1,7 @@
 import { routes, site } from "@/shared/config";
 import { buildMetadata } from "@/shared/lib/seo";
 import { company } from "@/entities/company";
+import { concepts } from "@/entities/concept";
 import { getFeaturedProjects } from "@/entities/project";
 import { CtaBand } from "@/widgets/cta-band";
 import { FeaturedProjects } from "@/widgets/featured-projects";
@@ -26,7 +27,8 @@ export default function HomePage() {
       <HomeIntro />
       <ServicesShowcase />
       <ProcessSection steps={company.process} scene={tower.load} poster={tower.poster} />
-      <FeaturedProjects projects={featured} />
+      {/* Without real projects, the section shows the clearly labelled illustrative concepts instead. */}
+      <FeaturedProjects projects={featured} concepts={concepts} />
       <ValuesSection values={company.values} />
       <CtaBand />
     </>
