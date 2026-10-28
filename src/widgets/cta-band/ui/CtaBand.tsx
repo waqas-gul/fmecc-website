@@ -10,8 +10,7 @@ import { Container, Eyebrow, LinkButton, Section } from "@/shared/ui";
  * quotation request plus whichever direct contact channels FMECC has supplied.
  */
 export function CtaBand({
-  // TODO(content): confirm the default prompt and supporting line with FMECC. The footer below
-  // carries "Have a project in mind?", so the band uses a different prompt.
+  // The footer below carries "Have a project in mind?", so the band uses a different prompt.
   title = "Planning a new project?",
   description = "Tell us about the site, the scope and the timeline, and we will arrange the next step.",
   primary = { label: "Request a quotation", href: routes.quote() },

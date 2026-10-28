@@ -47,7 +47,7 @@ export function ContactPanel() {
                 <span aria-hidden className="type-label pt-1 text-ink-subtle">
                   Office
                 </span>
-                <address className="text-body text-ink not-italic">{address}</address>
+                <address className="text-body whitespace-pre-line text-ink not-italic">{address}</address>
                 {mapsUrl && isWebUrl(mapsUrl) && (
                   <LinkButton href={mapsUrl} external variant="link" size="sm" className="min-h-11">
                     Open in Google Maps
@@ -66,15 +66,15 @@ export function ContactPanel() {
                 <span aria-hidden className="type-label pt-1 text-ink-subtle">
                   Office hours
                 </span>
-                <span className="text-body text-ink">{hours}</span>
+                <span className="text-body whitespace-pre-line text-ink">{hours}</span>
               </dd>
             </div>
           )}
         </dl>
       )}
 
+      {/* Shown until FMECC supplies contact details in src/shared/config/site.ts. */}
       {!hasDetails && (
-        // TODO(content): disappears once FMECC supplies phone, WhatsApp, email, address or hours in site.ts.
         <p className="border-y border-line py-5 text-body-sm text-ink-subtle">
           Direct phone, email and office details will be listed here once confirmed. In the meantime, please use the
           quotation form.

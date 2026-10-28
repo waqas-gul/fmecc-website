@@ -1,15 +1,13 @@
 import { Building, Cable, ClipboardCheck, FileCheck, HardHat, Layers, PaintRoller } from "lucide-react";
 
-import { placeholderImage } from "@/shared/lib/media";
-
 import type { Service } from "../model/types";
 
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.1).
 // It describes the work in general terms only: no clients, projects, figures, brands,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
 // must verify before launch. Hero and showcase are licensed stock photography, illustrative only
-// and never presented as FMECC work (planning/MEDIA_PLAN.md); gallery images are placeholders
-// whose alt text is the shot to supply.
+// and never presented as FMECC work (planning/MEDIA_PLAN.md). The gallery stays empty: it shows
+// only for a service without a showcase, and the shots wanted are listed in MEDIA_PLAN.md §6.
 export const buildingConstruction: Service = {
   slug: "building-construction",
   index: 1,
@@ -147,11 +145,7 @@ export const buildingConstruction: Service = {
         "Drawings or a design brief, the site location, the scope you want us to cover and your target dates. If the design is still developing, we can start with a budget estimate and refine it as the drawings progress.",
     },
   ],
-  gallery: [
-    placeholderImage("Site team checking reinforcement before a concrete pour", "3:2"),
-    placeholderImage("Building envelope and scaffolding during construction", "3:2"),
-    placeholderImage("Completed building exterior at handover", "3:2"),
-  ],
+  gallery: [],
   showcase: "building",
   seo: {
     title: "Building Construction Services",

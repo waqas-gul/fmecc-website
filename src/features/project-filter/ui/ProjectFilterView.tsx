@@ -138,7 +138,6 @@ function FilterEmptyState({ option, onShowAll }: { option: ServiceOption; onShow
     <div className="flex flex-col gap-8 rounded-md border border-dashed border-line-strong px-6 py-12 sm:px-10 lg:flex-row lg:items-end lg:justify-between lg:px-12 lg:py-16">
       <div className="max-w-[52ch]">
         <p className="type-label text-highlight">{option.label}</p>
-        {/* TODO(content): confirm the empty-state wording with FMECC. */}
         <h3 className="mt-5 font-display text-heading-md font-semibold">No projects published in this service yet.</h3>
         <p className="mt-4 text-ink-muted">
           Case studies appear here once their facts and imagery are confirmed. Show every project, or read what this

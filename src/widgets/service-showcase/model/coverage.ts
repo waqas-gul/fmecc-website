@@ -4,7 +4,7 @@
 
 export type CoverageLayer = "cameras" | "perimeter" | "access" | "links";
 
-// TODO(content): draft legend copy; FMECC to review the wording.
+// Legend for the illustrative coverage diagram: it describes the drawing, not a real site.
 export const coverageLayers: { id: CoverageLayer; title: string; description: string }[] = [
   { id: "cameras", title: "Camera coverage", description: "Fixed cameras and a PTZ dome, each drawn with its field of view." },
   { id: "perimeter", title: "Perimeter detection", description: "The fence line is split into zones, so an alarm points to one stretch." },

@@ -10,7 +10,6 @@ import { LinkButton, SectionHeader, VisuallyHidden } from "@/shared/ui";
 export function PortfolioInProgress() {
   return (
     <div className="grid gap-12 lg:grid-cols-12 lg:gap-8">
-      {/* TODO(content): confirm the wording with FMECC. */}
       <SectionHeader
         eyebrow="Portfolio in progress"
         title="Case studies are being prepared."

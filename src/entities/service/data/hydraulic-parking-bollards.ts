@@ -16,7 +16,8 @@ import type { Service } from "../model/types";
 // It describes the work in general terms only: no clients, product brands, cycle times,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
 // must verify before launch. Name a product brand only once FMECC confirms its sources.
-// Every image is a placeholder; its alt text is the shot to supply.
+// Hero and showcase are placeholders whose alt text is the shot to supply (planning/MEDIA_PLAN.md §9).
+// The gallery stays empty: it shows only for a service without a showcase.
 export const hydraulicParkingBollards: Service = {
   slug: "hydraulic-parking-bollards",
   index: 4,
@@ -118,6 +119,11 @@ export const hydraulicParkingBollards: Service = {
     "Hydraulic bollards need regular attention to hydraulic fluid, seals, drainage and control equipment. Visits follow the manufacturer's recommended intervals and the way the site is used, and their frequency is agreed in a service contract.",
   faq: [
     {
+      question: "What is a hydraulic parking bollard?",
+      answer:
+        "A hydraulic bollard is a steel post set in a housing below the road surface. A hydraulic power unit raises it to block a lane and lowers it flush with the surface, so authorised vehicles can drive over it. Bollards are usually installed in a row across an entrance and operated from a control system, on their own or together with gates and barriers.",
+    },
+    {
       question: "How fast do the bollards rise and lower?",
       answer:
         "Rise and lower times depend on the model, its height and the hydraulic unit. The proposal gives the manufacturer's figures for the specified product, so you can match the speed to your traffic flow.",
@@ -144,11 +150,7 @@ export const hydraulicParkingBollards: Service = {
         "The site location, the number of lanes or entrances to control, photographs of the entrance, how users should gain access and any security requirements. A site assessment confirms the final scope.",
     },
   ],
-  gallery: [
-    placeholderImage("Row of raised hydraulic bollards at a commercial entrance", "3:2"),
-    placeholderImage("Bollard head with integrated warning lights, close-up", "3:2"),
-    placeholderImage("Bollards lowered flush with the paving at a villa gate", "3:2"),
-  ],
+  gallery: [],
   showcase: "bollard",
   seo: {
     title: "Hydraulic Parking Bollard Installation",

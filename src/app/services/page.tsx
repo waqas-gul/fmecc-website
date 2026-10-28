@@ -9,7 +9,6 @@ import { CtaBand } from "@/widgets/cta-band";
 import { PageHero } from "@/widgets/page-hero";
 import { DeliveryProcess, ServicePanels } from "@/widgets/service-detail";
 
-// TODO(content): confirm the overview headline, lede and process introduction with FMECC.
 export const metadata = buildMetadata({
   title: "Construction, Telecom and Security Services",
   description:

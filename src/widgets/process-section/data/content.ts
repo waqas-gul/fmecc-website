@@ -1,11 +1,11 @@
-// TODO(content): draft section copy for FMECC to confirm. The steps themselves come from
-// `company.process` (entities/company) and are shared with the About page.
+// Section copy. The steps come from `company.process` (entities/company), where they await FMECC's
+// confirmation, and are shared with the About page.
 export const processContent = {
   eyebrow: "How we deliver",
   title: "A clear path from first survey to handover.",
-  lede: "One delivery process across all four disciplines, so you know what happens at each stage and who is responsible for it.",
+  lede: "One delivery process across all four disciplines, so you know what happens at each stage.",
   cta: "Request a quotation",
-  ctaNote: "Every project starts with a consultation.",
+  ctaNote: "Start with a short description of the site and the scope.",
   stepLabel: "Step",
   /** Text alternative for the tower scene; the poster carries its own alt text. */
   sceneLabel:

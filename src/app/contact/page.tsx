@@ -24,7 +24,6 @@ export const metadata = buildMetadata({
 export default function ContactPage() {
   return (
     <>
-      {/* TODO(content): FMECC to confirm the hero and closing copy. */}
       <PageHero
         eyebrow="Contact and quotation"
         title="Tell us about your project."

@@ -1,5 +1,5 @@
-// TODO(content): draft section copy for FMECC to confirm. The principles come from
-// `company.values` (entities/company) and are generic: no certifications or claims.
+// Section copy. The principles come from `company.values` (entities/company), where they await
+// FMECC's confirmation; they are generic: no certifications or claims.
 export const valuesContent = {
   eyebrow: "Why FMECC",
   title: "Principles we hold on every site.",

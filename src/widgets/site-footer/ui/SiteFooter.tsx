@@ -56,8 +56,12 @@ export function SiteFooter() {
                   </a>
                 </li>
               ))}
-              {site.contact.address && <li className="py-3 text-body-sm text-ink-muted">{site.contact.address}</li>}
-              {site.contact.hours && <li className="py-3 text-body-sm text-ink-muted">{site.contact.hours}</li>}
+              {site.contact.address && (
+                <li className="py-3 text-body-sm whitespace-pre-line text-ink-muted">{site.contact.address}</li>
+              )}
+              {site.contact.hours && (
+                <li className="py-3 text-body-sm whitespace-pre-line text-ink-muted">{site.contact.hours}</li>
+              )}
               {contactLinks.length === 0 && (
                 <li>
                   <Link href={routes.contact} className={linkClasses}>

@@ -96,7 +96,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       {related.length > 0 && (
         <Section container="wide">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            {/* TODO(content): confirm the heading with FMECC. */}
             <SectionHeader eyebrow="Related projects" title="More from the portfolio" />
             <LinkButton
               href={routes.projects}
@@ -117,7 +116,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </Section>
       )}
 
-      {/* TODO(content): confirm the prompt with FMECC. */}
       <CtaBand
         title="Planning a similar project?"
         primary={{ label: "Request a quotation", href: routes.quote(project.services[0]) }}

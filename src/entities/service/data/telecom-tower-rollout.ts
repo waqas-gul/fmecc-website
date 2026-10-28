@@ -1,15 +1,13 @@
 import { ClipboardCheck, PlugZap, RadioTower, ScanSearch, Shovel, Zap } from "lucide-react";
 
-import { placeholderImage } from "@/shared/lib/media";
-
 import type { Service } from "../model/types";
 
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.2).
 // It describes the work in general terms only: no clients, operators, site counts, brands,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
 // must verify before launch. Hero and showcase are licensed stock photography, illustrative only
-// and never presented as FMECC work (planning/MEDIA_PLAN.md); gallery images are placeholders
-// whose alt text is the shot to supply.
+// and never presented as FMECC work (planning/MEDIA_PLAN.md). The gallery stays empty: it shows
+// only for a service without a showcase, and the shots wanted are listed in MEDIA_PLAN.md §7.
 export const telecomTowerRollout: Service = {
   slug: "telecom-tower-rollout",
   index: 2,
@@ -145,11 +143,7 @@ export const telecomTowerRollout: Service = {
         "The site list or locations, the tower or structure types, the status of the design and the scope you want us to cover, from civil works only to a turnkey build.",
     },
   ],
-  gallery: [
-    placeholderImage("Rigging crew in fall-protection harnesses erecting a tower section", "3:2"),
-    placeholderImage("Telecom tower foundation with reinforcement before the concrete pour", "3:2"),
-    placeholderImage("Completed telecom site with equipment cabinets and perimeter fencing", "3:2"),
-  ],
+  gallery: [],
   showcase: "tower",
   seo: {
     title: "Telecom Tower Rollout and Site Construction",

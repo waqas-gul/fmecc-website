@@ -24,8 +24,8 @@ export type ShowcaseContent =
 
 const ILLUSTRATIVE = "Illustrative model. It does not depict a specific FMECC project.";
 
-// TODO(content): draft section copy describing the illustrations; FMECC to review the wording.
-// The stages describe the generic construction sequence shown in each model, not company claims.
+// Section copy describing the illustrations. The stages describe the generic construction sequence
+// shown in each model, not company claims.
 // Partial on purpose: a showcase key without an entry falls back to the service gallery.
 export const showcases: Partial<Record<ShowcaseKey, ShowcaseContent>> = {
   tower: {

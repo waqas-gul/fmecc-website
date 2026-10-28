@@ -6,7 +6,6 @@ import { IconTile, LinkButton } from "@/shared/ui";
 
 const icons: Record<ContactLink["kind"], LucideIcon> = { phone: Phone, whatsapp: MessageCircle, email: Mail };
 
-// TODO(content): FMECC to confirm the greeting that pre-fills a WhatsApp chat.
 const WHATSAPP_GREETING = "Hello FMECC, I would like to discuss a project.";
 
 /** WhatsApp opens in a new tab with a greeting filled in (planning/MASTER_PLAN.md §7); phone and email open as-is. */

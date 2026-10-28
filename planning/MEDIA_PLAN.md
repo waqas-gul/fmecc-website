@@ -245,6 +245,13 @@ Destinations:
 - Adobe Stock 163019738: https://stock.adobe.com/images/automatisch-versenkbarer-poller-automatikpoller-automatic-retractable-bollard/163019738
 - Adobe Stock 248074165: https://stock.adobe.com/lu_fr/images/automatic-retractable-bollard-with-glowing-lights-for-control-of-road-traffic-and-parking-light-architecture-automatic-blocking-bollard/248074165
 
+**Phase 8 re-search (2026-10-28): no suitable free image.** Searched Unsplash, Pexels, Pixabay, Flickr (CC0/PD), Wikimedia Commons and Openverse with English, German, French, Italian and Spanish terms. The bollards page keeps its placeholders and 3D scene. Near misses, with the reason each failed:
+- Pixabay 1342307 (row of raised bollards in flush housings, Rome): the right look, but only 1920 px is available without an account (hero crop 1360×765, showcase 696×870), and the page does not say retractable or automatic. Worth revisiting only with the 6000×3750 original.
+- Unsplash RyCNNHk3Wc0 (Ljubljana): a legible "ULTIMAT…" maker's mark on the heads, red painted discs, and a pedestrian in frame.
+- Pixabay 4619073: "INTESIK" brand and web address on the heads; heavy amber grade.
+- Pexels 37983782 (Münster): people, construction barriers and shop signs in every crop.
+- Wikimedia Commons: the public-domain and CC0 files are yellow, low-resolution or show a landmark; the rest are CC BY-SA and would need a visible credit.
+
 **Strongly preferred over any stock:** photos of bollard installations FMECC has actually carried out, or product photos the bollard supplier licenses to FMECC. Manufacturers' press photos are not stock-licensed and must not be used without the manufacturer's written permission.
 
 ## 10. About page hero
@@ -364,7 +371,7 @@ Approve or swap each line, then download, record it in the licence log below, an
 - [x] P4 Security showcase: **Pexels 3714318** (primary rejected) → `media-src/services/security-systems/showcase-camera-outside-glass-building.jpg`
 - [ ] P4 Bollards showcase: iStock 2278170466 ($12): **paid, awaiting approval; not purchased**
 - [x] P5 About hero: **Pexels 31197870** (primary rejected) → `media-src/about/about-hero-steel-frame.jpg`
-- [ ] P6 Galleries (optional, not displayed): decide later; client photography preferred
+- [ ] P6 Galleries (optional, not displayed; placeholders removed in Phase 8, briefs kept in §6–§9): decide later; client photography preferred
 - [x] Visual check of every integrated asset at full size: grade, logos and readable text, faces, watermark, AI artefacts, crop (§16.2)
 - [x] Licence log completed for every integrated asset (§15)
 - [x] After integration: `npm run check`, budgets measured, visual QA (§16.5)
@@ -406,7 +413,8 @@ How the licences were checked:
 | About hero (`src/app/about/page.tsx`) | Pexels 31197870 | "Structural steel frame of a building under construction against a pale sky" |
 
 Unchanged:
-- The bollards hero and showcase, all twelve gallery images, and the Projects page.
+- The bollards hero and showcase, and the Projects page.
+- The twelve gallery placeholders were removed later, in Phase 8 (`gallery: []`). A service gallery renders only for a service without a showcase, and all four services have one. The shots wanted stay listed in the Gallery tables of §6–§9.
 - The 3D scenes and their posters.
 - Every `TODO(content)` marker.
 

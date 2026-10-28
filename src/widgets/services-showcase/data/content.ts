@@ -1,5 +1,4 @@
-// TODO(content): draft section copy for FMECC to confirm. Service names, taglines and summaries
-// come from `services` (entities/service).
+// Section copy. Service names, taglines and summaries come from `services` (entities/service).
 export const showcaseContent = {
   eyebrow: "Services",
   title: "What we build, install and maintain.",

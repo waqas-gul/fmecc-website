@@ -123,7 +123,7 @@ Channels (each renders only if present in `site.contact`; missing values are omi
 Quotation form (`QuoteRequestForm`):
 - Fields: full name*, company, email*, phone*, service* (four services + "Other"), project location, project brief*, preferred contact method, consent checkbox*. Honeypot field for spam.
 - Preselect service from `?service=<slug>`.
-- Delivery (no backend): `POST` JSON to `NEXT_PUBLIC_FORM_ENDPOINT` (a Formspree / Web3Forms-compatible endpoint supplied by the client). When the variable is unset, the submit button composes a `mailto:` with the form content as a fallback and says so.
+- Delivery (no backend): `POST` JSON to `NEXT_PUBLIC_FORM_ENDPOINT` (a Formspree-compatible endpoint supplied by the client; Web3Forms would also need its access key sent in the body). When the variable is unset, the submit button composes a `mailto:` with the form content as a fallback and says so.
 - States: idle, submitting, success (clear confirmation plus channels to reach FMECC faster), error (retry plus fallback channels).
 - Validation: client-side, inline messages, `aria-describedby`, focus moves to the first error, live region for status.
 - Privacy line under the form; link to `/privacy/` only when that page exists.

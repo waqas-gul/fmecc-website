@@ -11,7 +11,8 @@ export interface NavItem {
 
 /** Navigation labels for the four services, in the approved order (MASTER_PLAN.md §4). */
 export const serviceNav: readonly { slug: ServiceSlug; label: string; description: string; icon: LucideIcon }[] = [
-  // TODO(content): one-line descriptions are drafts for FMECC to confirm.
+  // TODO(content): two one-liners repeat facts FMECC must confirm: the building segments and whether
+  // FMECC supplies the bollards. Keep them in step with src/entities/service/data.
   {
     slug: "building-construction",
     label: "Building Construction",

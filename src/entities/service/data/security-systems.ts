@@ -1,15 +1,13 @@
 import { BellRing, Cctv, KeyRound, MonitorCog, Siren, Wrench } from "lucide-react";
 
-import { placeholderImage } from "@/shared/lib/media";
-
 import type { Service } from "../model/types";
 
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.3).
 // It describes the work in general terms only: no clients, equipment brands, response times,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
 // must verify before launch. Hero and showcase are licensed stock photography, illustrative only
-// and never presented as FMECC work (planning/MEDIA_PLAN.md); gallery images are placeholders
-// whose alt text is the shot to supply.
+// and never presented as FMECC work (planning/MEDIA_PLAN.md). The gallery stays empty: it shows
+// only for a service without a showcase, and the shots wanted are listed in MEDIA_PLAN.md §8.
 export const securitySystems: Service = {
   slug: "security-systems",
   index: 3,
@@ -144,11 +142,7 @@ export const securitySystems: Service = {
         "The site location and type, floor plans or a site layout if available, the areas to cover and any existing equipment. A site survey is usually needed before a final price.",
     },
   ],
-  gallery: [
-    placeholderImage("Dome camera installed above a building entrance", "3:2"),
-    placeholderImage("Technician testing an access-control reader beside a door", "3:2"),
-    placeholderImage("Video intercom panel at a gated vehicle entrance", "3:2"),
-  ],
+  gallery: [],
   showcase: "coverage",
   seo: {
     title: "Security System Installation and Maintenance",

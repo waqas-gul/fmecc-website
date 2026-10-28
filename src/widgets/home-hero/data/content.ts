@@ -1,7 +1,8 @@
 import type { VideoAsset } from "@/shared/types/media";
 
-// TODO(content): draft hero copy for FMECC to confirm. It names the four services only and makes
-// no claims about scale, history or clients (planning/MASTER_PLAN.md §5, row 1).
+// TODO(content): confirm the lede's claim that FMECC delivers each service from first survey to final
+// handover. The copy names the four services only and makes no claims about scale, history or clients
+// (planning/MASTER_PLAN.md §5, row 1).
 export const heroContent = {
   eyebrow: "Engineering and construction",
   /** Authored lines of the display headline (max three), revealed one by one. */

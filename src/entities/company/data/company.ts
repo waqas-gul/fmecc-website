@@ -4,7 +4,8 @@ import type { CompanyContent } from "../model/types";
 
 // TODO(content): FMECC supplies the company description, values and process wording
 // (planning/MASTER_PLAN.md §13). The drafts below describe the four services and generic
-// principles only; they contain no figures, clients, certifications or history.
+// principles only; they contain no figures, clients, certifications or history. The process is
+// also restated in the Home hero lede and in the Home and Services process introductions.
 export const company: CompanyContent = {
   statement: "One partner for buildings, telecom sites, security systems and access control.",
   intro: [

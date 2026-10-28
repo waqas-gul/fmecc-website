@@ -8,7 +8,6 @@ import { PageHero } from "@/widgets/page-hero";
 
 import { checkPortfolio } from "./_lib/check-portfolio";
 
-// TODO(content): confirm the page copy with FMECC.
 export const metadata = buildMetadata({
   title: "Projects",
   description:
@@ -26,10 +25,9 @@ export default function ProjectsPage() {
       <PageHero
         eyebrow="Portfolio"
         title="Project portfolio"
-        // TODO(content): confirm both ledes with FMECC.
         lede={
           hasProjects
-            ? "Completed and ongoing work across our four disciplines. Filter by service to see the projects closest to yours."
+            ? "Work across our four disciplines. Filter by service to find the projects closest to yours."
             : "Verified work across building construction, telecom tower rollout, security systems and hydraulic parking bollards will be published here."
         }
         breadcrumbs={[{ label: "Home", href: routes.home }, { label: "Projects" }]}
