@@ -332,7 +332,7 @@ export function ServiceProcess(props: { service: Service }): React.JSX.Element;
 export function DeliveryProcess(props: { id?: string; eyebrow: string; title: string; lede?: string; steps: readonly { title: string; description: string }[]; children?: React.ReactNode }): React.JSX.Element;  // dark numbered steps; ServiceProcess and the services overview
 export function ServicePanels(props: { services: readonly Service[] }): React.JSX.Element;   // services overview: alternating panels with scope, explore and quote links
 export function ServiceShowcase(props: { service: Service }): React.JSX.Element;            // maps service.showcase → scene / diagram / gallery; renders its own Section (id "showcase")
-export const showcaseScenes: Record<'tower' | 'building' | 'bollard', { load: SceneLoader; poster: ImageAsset; label: string }>;  // widgets/service-showcase (WS-5): feeds any LazyScene slot, e.g. Home's ProcessSection; `load` is a client reference
+export const showcaseScenes: Record<'tower' | 'building' | 'bollard', { load: SceneLoader; poster: ImageAsset; label: string }>;  // widgets/service-showcase (WS-5): feeds any LazyScene slot, e.g. the ProcessSection on Home and About; `load` is a client reference
 export function ServiceFaq(props: { service: Service }): React.JSX.Element;
 export function RelatedProjects(props: { service: Service; projects: Project[] }): React.JSX.Element;
 export function ProjectFacts(props: { project: Project }): React.JSX.Element;

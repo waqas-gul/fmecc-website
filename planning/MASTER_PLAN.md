@@ -179,7 +179,7 @@ Tiers (each tier degrades to the one below):
 3. **3D (enhancement)** — three procedural scenes (tower, bollard, building) built with React Three Fiber + Drei, code-split per scene, gated by device tier, reduced-motion preference and WebGL support; poster image fallback in every case.
 
 Rules
-- One 3D canvas mounted per page at most. Home uses the tower scene only; service pages use their own scene.
+- One 3D canvas mounted per page at most. Home and About use the tower scene only (in the shared process section); service pages use their own scene.
 - Every scene has an equivalent still image and a text alternative; nothing is communicated only by motion.
 - Placeholder media during development: neutral in-repo SVG/gradient placeholders flagged `placeholder: true`. No stock imagery presented as FMECC work. Licensed generic imagery is acceptable for service illustration only, and is tracked in the content checklist (§13).
 - Authoring specs (dimensions, codecs, grading) are in DESIGN.md §12.

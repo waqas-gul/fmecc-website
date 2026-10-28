@@ -231,7 +231,7 @@ If `company.stats` is empty, no statistics band exists; do not leave an empty ga
 Service pages share identical rhythm and components; only media, showcase and content differ. No bespoke layouts per service.
 
 ### 9.3 Other inner pages
-- **About**: PageHero (image), story (two columns), values grid, process section (reused from Home with the same data), optional leadership and registrations blocks (render only with data), CTA.
+- **About**: PageHero (image), story (two columns), values grid, process section (reused from Home with the same data and the same assembling tower scene), optional leadership and registrations blocks (render only with data), CTA.
 - **Services overview**: PageHero (no media), four large alternating panels (media left/right), shared process, CTA.
 - **Projects**: PageHero (no media), filter chips, grid, empty state, CTA.
 - **Project detail**: PageHero with hero media, facts sidebar (sticky ≥ 1024) beside narrative, gallery grid (2 columns, mixed 3:2 and 4:5), related projects, CTA.

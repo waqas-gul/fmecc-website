@@ -55,8 +55,8 @@ export default function AboutPage() {
       />
       <AboutStory statement={company.statement} intro={company.intro} stats={company.stats} />
       <ValuesSection values={company.values} />
-      {/* Home's process section and visual; the still poster only, Home keeps the one 3D scene. */}
-      <ProcessSection steps={company.process} poster={showcaseScenes.tower.poster} />
+      {/* Home's process section and visual: the 3D tower assembles with the steps (poster fallback). */}
+      <ProcessSection steps={company.process} scene={showcaseScenes.tower.load} poster={showcaseScenes.tower.poster} />
       <AboutServices services={services} />
       <AboutStandards />
       <AboutTeam leadership={company.leadership} />
