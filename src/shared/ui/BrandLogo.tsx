@@ -11,7 +11,9 @@ const heightClasses = {
 
 /**
  * FMECC logo lockup exactly as supplied, never recoloured or separated (planning/DESIGN.md §2.1).
- * The supplied PNG is transparent, so it sits directly on every surface.
+ * The supplied PNG is transparent and its wordmarks are dark blue, so on dark schemes it sits on a
+ * compact white plate (`--logo-plate`); on light surfaces the plate is transparent. The padding is
+ * constant, so the header does not shift when it changes scheme on scroll.
  * Until public/images/brand/logo.png is added and `npm run images` has run, a clearly marked
  * temporary text logo is rendered instead; it is not a redrawn logo.
  */
@@ -34,7 +36,7 @@ export function BrandLogo({ size = "md", className }: { size?: keyof typeof heig
   }
 
   return (
-    <span className={cn("inline-flex", className)}>
+    <span className={cn("inline-flex rounded-md bg-logo-plate px-2.5 py-1.5 transition-colors duration-300", className)}>
       <Image
         src={brandLogo.src}
         alt={brandLogo.alt}

@@ -8,15 +8,14 @@ import {
   Wrench,
 } from "lucide-react";
 
-import { placeholderImage } from "@/shared/lib/media";
-
 import type { Service } from "../model/types";
 
 // TODO(content): draft copy for FMECC to confirm, trim or extend (planning/MASTER_PLAN.md §4.4).
 // It describes the work in general terms only: no clients, product brands, cycle times,
 // certifications or guarantees. "TODO(content): confirm" marks a specific capability claim FMECC
 // must verify before launch. Name a product brand only once FMECC confirms its sources.
-// Hero and showcase are placeholders whose alt text is the shot to supply (planning/MEDIA_PLAN.md §9).
+// Hero and showcase reuse the site's own 3D bollard render (media-src/showcase/bollard-scene.png):
+// an illustration, not a photograph, until FMECC supplies photos (planning/MEDIA_PLAN.md §9).
 // The gallery stays empty: it shows only for a service without a showcase.
 export const hydraulicParkingBollards: Service = {
   slug: "hydraulic-parking-bollards",
@@ -28,8 +27,18 @@ export const hydraulicParkingBollards: Service = {
   summary:
     "FMECC supplies and installs automatic hydraulic bollards for villas, residential compounds, commercial entrances and secure sites: civil works, hydraulic units, controls and safety features, with commissioning and maintenance after handover.",
   icon: SquareParking,
-  hero: placeholderImage("Automatic bollards controlling a vehicle entrance, cool highlights", "16:9"),
-  showcaseMedia: placeholderImage("Hydraulic bollard in the raised position, close detail", "4:5"),
+  hero: {
+    src: "/images/services/hydraulic-parking-bollards/hero-bollard-cutaway-illustration.webp",
+    width: 1600,
+    height: 900,
+    alt: "Illustration of three raised hydraulic bollards in paving, cut away to show their below-ground housings and hydraulic rams",
+  },
+  showcaseMedia: {
+    src: "/images/showcase/bollard-scene.webp",
+    width: 1600,
+    height: 2000,
+    alt: "Cutaway illustration of three raised stainless-steel hydraulic bollards in paving, showing the below-ground housings and hydraulic rams",
+  },
   audiences: [
     "Villas and private residences",
     "Residential compounds",

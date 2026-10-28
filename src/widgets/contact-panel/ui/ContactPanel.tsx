@@ -28,6 +28,8 @@ const demoIcons: Record<DemoContactItem["kind"], LucideIcon> = {
 export function ContactPanel() {
   const { address, hours, mapsUrl } = site.contact;
   const hasDetails = contactLinks.length > 0 || Boolean(address) || Boolean(hours);
+  // TEMPORARY preview: sample details on show and the form in demo mode (no endpoint yet).
+  const preview = demoContactItems.length > 0 && !site.formEndpoint;
 
   return (
     <aside aria-labelledby="contact-panel-title" className="flex flex-col gap-10">
@@ -37,7 +39,9 @@ export function ContactPanel() {
           Talk to the team
         </h2>
         <p className="mt-4 max-w-[48ch] text-body text-ink-muted">
-          Prefer a conversation? Contact us directly, or send the quotation form and we will reply.
+          {preview
+            ? "Explore our services and try the quotation form preview. Contact details and online submissions will be enabled once confirmed."
+            : "Prefer a conversation? Contact us directly, or send the quotation form and we will reply."}
         </p>
       </div>
 

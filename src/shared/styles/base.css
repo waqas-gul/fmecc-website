@@ -28,6 +28,8 @@
     --focus: var(--color-blue-600);
     --danger: var(--color-danger-600);
     --spectrum: linear-gradient(90deg, var(--color-purple-500), var(--color-blue-600), var(--color-cyan-500));
+    /* Plate behind the logo lockup: none on light surfaces (DESIGN.md §2.1). */
+    --logo-plate: transparent;
   }
 
   [data-scheme="dark"] {
@@ -51,6 +53,7 @@
     --focus: var(--color-cyan-500);
     --danger: var(--color-danger-300);
     --spectrum: linear-gradient(90deg, var(--color-purple-300), var(--color-blue-300), var(--color-cyan-300));
+    --logo-plate: var(--color-white);
   }
 
   [data-scheme="brand"] {
@@ -74,6 +77,7 @@
     --focus: var(--color-cyan-500);
     --danger: var(--color-danger-300);
     --spectrum: linear-gradient(90deg, var(--color-purple-300), var(--color-blue-300), var(--color-cyan-300));
+    --logo-plate: var(--color-white);
   }
 
   :root {

@@ -3,7 +3,7 @@
 Status: **free selections integrated on 2026-10-28 (§16).**
 - Three research primaries failed the pixel inspection and were replaced by their backups: the Security hero, the Security showcase and the About hero.
 - The Home hero video plays from 1024 px only (decision of 2026-10-28, §16.5). Narrower screens, reduced motion and Save-Data get the poster alone.
-- The paid iStock bollard images were **not purchased**. The bollards page keeps its marked placeholders and 3D scene until photographs are approved.
+- The paid iStock bollard images were **not purchased**. Until photographs are approved, the bollards hero and showcase reuse the site's own 3D bollard render (an illustration, `media-src/showcase/bollard-scene.png` and a 16:9 crop of it), and the interactive 3D scene stays.
 - Research was compiled on 2026-10-28; §1–§13 are the research as approved.
 
 Read with DESIGN.md §12 (art direction, image and video specs), MASTER_PLAN.md §8 (performance budgets), §9 (media strategy) and §13 (content replacement checklist).
@@ -245,7 +245,7 @@ Destinations:
 - Adobe Stock 163019738: https://stock.adobe.com/images/automatisch-versenkbarer-poller-automatikpoller-automatic-retractable-bollard/163019738
 - Adobe Stock 248074165: https://stock.adobe.com/lu_fr/images/automatic-retractable-bollard-with-glowing-lights-for-control-of-road-traffic-and-parking-light-architecture-automatic-blocking-bollard/248074165
 
-**Phase 8 re-search (2026-10-28): no suitable free image.** Searched Unsplash, Pexels, Pixabay, Flickr (CC0/PD), Wikimedia Commons and Openverse with English, German, French, Italian and Spanish terms. The bollards page keeps its placeholders and 3D scene. Near misses, with the reason each failed:
+**Phase 8 re-search (2026-10-28): no suitable free image.** Searched Unsplash, Pexels, Pixabay, Flickr (CC0/PD), Wikimedia Commons and Openverse with English, German, French, Italian and Spanish terms. The bollards page uses its own 3D render as an illustration instead (see the status line at the top). Near misses, with the reason each failed:
 - Pixabay 1342307 (row of raised bollards in flush housings, Rome): the right look, but only 1920 px is available without an account (hero crop 1360×765, showcase 696×870), and the page does not say retractable or automatic. Worth revisiting only with the 6000×3750 original.
 - Unsplash RyCNNHk3Wc0 (Ljubljana): a legible "ULTIMAT…" maker's mark on the heads, red painted discs, and a pedestrian in frame.
 - Pixabay 4619073: "INTESIK" brand and web address on the heads; heavy amber grade.

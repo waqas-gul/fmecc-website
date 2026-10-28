@@ -117,4 +117,5 @@
   --color-highlight: var(--highlight);
   --color-focus: var(--focus);
   --color-danger: var(--danger);
+  --color-logo-plate: var(--logo-plate);
 }
