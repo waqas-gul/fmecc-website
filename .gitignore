@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+# local QA captures and reports (never shipped, never committed)
+/qa/
 
 # next.js
 /.next/

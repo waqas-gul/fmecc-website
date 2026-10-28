@@ -52,14 +52,16 @@ export function SiteHeader({ variant = "solid" }: { variant?: "overlay" | "solid
           "transition-[height,background-color,box-shadow,translate,color] duration-250 ease-out-expo",
           transparent && "bg-transparent",
           !transparent && !scrolled && "border-b border-line bg-surface",
-          scrolled && "bg-surface/92 shadow-raised backdrop-blur-md lg:h-16",
+          scrolled && "bg-surface/92 backdrop-blur-md lg:h-16",
+          // The raised shadow reaches ~40 px below the bar, so a hidden header must not keep it.
+          scrolled && !hidden && "shadow-raised",
           hidden && "-translate-y-full",
         )}
       >
         <Container size="wide" className="flex h-full items-center gap-4">
           <div className="flex flex-1 items-center">
             <Link href={routes.home} aria-current={pathname === "/" ? "page" : undefined} className="-m-1 rounded-sm p-1">
-              <BrandLogo size="md" plate={transparent} />
+              <BrandLogo size="md" />
             </Link>
           </div>
 

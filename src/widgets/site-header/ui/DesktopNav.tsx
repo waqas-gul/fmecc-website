@@ -6,6 +6,7 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 
 import { mainNav, type NavItem } from "@/shared/config";
 import { cn } from "@/shared/lib/utils";
+import { IconTile } from "@/shared/ui";
 
 import { isActivePath, pad } from "../lib/nav";
 
@@ -196,19 +197,24 @@ function ServicesMenu({
               const Icon = child.icon;
               return (
                 <li key={child.href} className="bg-surface-raised">
+                  {/* Named by the service alone; the summary is its description, not part of the name. */}
                   <Link
                     href={child.href}
                     data-menu-item=""
                     aria-current={isActivePath(pathname, child.href) ? "page" : undefined}
+                    aria-describedby={`${panelId}-${index}`}
                     className="group/item flex h-full gap-4 p-5 transition-colors duration-150 hover:bg-surface-muted focus-visible:-outline-offset-2 aria-[current=page]:bg-surface-muted"
                   >
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-line text-highlight transition-colors duration-150 group-hover/item:border-accent group-hover/item:text-accent-text">
-                      <Icon aria-hidden className="size-5" />
-                    </span>
+                    <IconTile
+                      icon={Icon}
+                      className="transition-colors duration-150 group-hover/item:border-accent group-hover/item:text-accent-text"
+                    />
                     <span className="flex flex-col gap-1.5">
                       <span aria-hidden className="type-label text-ink-subtle tabular-nums">{pad(index + 1)}</span>
                       <span className="font-display text-body font-semibold text-ink">{child.label}</span>
-                      <span className="text-body-sm text-ink-muted">{child.description}</span>
+                      <span id={`${panelId}-${index}`} aria-hidden className="text-body-sm text-ink-muted">
+                        {child.description}
+                      </span>
                     </span>
                   </Link>
                 </li>

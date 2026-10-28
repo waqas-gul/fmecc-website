@@ -39,13 +39,20 @@ export function HomeIntro() {
           <ol className="mt-6 border-t border-line">
             {services.map((service, index) => (
               <Reveal as="li" key={service.slug} delay={index * 0.08} className="border-b border-line">
-                <Link href={routes.service(service.slug)} className="group flex items-start gap-5 py-6">
+                {/* Named by the service alone; the tagline is its description, not part of the name. */}
+                <Link
+                  href={routes.service(service.slug)}
+                  aria-describedby={`intro-tagline-${service.slug}`}
+                  className="group flex items-start gap-5 py-6"
+                >
                   <span aria-hidden className="type-label pt-1.5 text-highlight tabular-nums">{pad(service.index)}</span>
                   <span className="flex flex-1 flex-col gap-1.5">
                     <span className="font-display text-heading-sm font-semibold text-ink transition-colors duration-150 group-hover:text-accent-text">
                       {service.name}
                     </span>
-                    <span className="text-body-sm text-ink-muted">{service.tagline}</span>
+                    <span id={`intro-tagline-${service.slug}`} aria-hidden className="text-body-sm text-ink-muted">
+                      {service.tagline}
+                    </span>
                   </span>
                   <ArrowRight
                     aria-hidden

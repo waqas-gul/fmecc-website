@@ -2,10 +2,9 @@ import { ArrowRight } from "lucide-react";
 
 import type { Service } from "@/entities/service";
 import { routes } from "@/shared/config";
-import { LinkButton, Section, SectionHeader } from "@/shared/ui";
+import { IconTile, LinkButton, Section, SectionHeader } from "@/shared/ui";
 
 import { aboutContent } from "../data/about";
-import { IconTile } from "./IconTile";
 
 /**
  * The four service areas as ruled rows: name, tagline and summary, plus audiences and scope once the
@@ -41,7 +40,15 @@ export function AboutServices({ services }: { services: readonly Service[] }) {
                   {service.audiences.length > 0 && (
                     <div>
                       <p className="type-label text-ink-subtle">Who it is for</p>
-                      <p className="mt-3 text-body-sm text-ink-muted">{service.audiences.join(", ")}</p>
+                      {/* A list like the scope below, not a comma-joined sentence: entries are capitalised and some contain commas. */}
+                      <ul className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+                        {service.audiences.map((audience) => (
+                          <li key={audience} className="flex gap-3 text-body-sm text-ink-muted">
+                            <span aria-hidden className="mt-[0.75em] h-px w-3 shrink-0 bg-line-strong" />
+                            {audience}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                   {scope.length > 0 && (

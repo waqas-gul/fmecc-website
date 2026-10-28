@@ -1,10 +1,9 @@
 import { BadgeCheck } from "lucide-react";
 
 import type { CompanyContent } from "@/entities/company";
-import { Card, Section, SectionHeader } from "@/shared/ui";
+import { Card, IconTile, Section, SectionHeader } from "@/shared/ui";
 
 import { aboutContent } from "../data/about";
-import { IconTile } from "./IconTile";
 
 /** Registrations and certifications, rendered only when FMECC supplies them in `company.registrations`. */
 export function AboutRegistrations({ registrations }: { registrations: CompanyContent["registrations"] }) {

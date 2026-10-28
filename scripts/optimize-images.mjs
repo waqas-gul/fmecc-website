@@ -5,9 +5,13 @@
 //      → public/images/<section>/<name>-<w>.webp for every width next/image can request.
 //    Widths larger than the original are written at the original size (no enlargement), so every
 //    srcset entry exists. Unchanged originals are skipped.
-// 2. public/images/brand/logo.png, used exactly as supplied (only scaled, never redrawn)
-//      → public/images/brand/logo-96.webp (header and footer: 2× the largest 48 px display height)
-//      → src/app/icon.png (192 px), src/app/apple-icon.png (180 px), src/app/opengraph-image.png (+ .alt.txt)
+// 2. public/images/brand/logo.png, used exactly as supplied (only scaled or cropped, never redrawn)
+//      → public/images/brand/logo-96.webp, transparency kept (header, menu and footer: 2× the
+//        largest 48 px display height)
+//      → src/app/icon.png (192 px), src/app/apple-icon.png (180 px): the diamond mark alone, cropped
+//        from the lockup, because the wordmarks are unreadable at icon sizes; the full lockup if the
+//        artwork is not laid out as mark above wordmarks
+//      → src/app/opengraph-image.png (+ .alt.txt): the full lockup
 //      → src/shared/config/brand-assets.json, read by the BrandLogo component.
 //
 // `npm run images` runs both steps; `npm run images -- --media` or `-- --brand` runs one of them.
@@ -99,8 +103,43 @@ const spectrumBar = (width, height) =>
       `<stop offset="1" stop-color="#13C9D7"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#s)"/></svg>`,
   );
 
-async function logoOnWhite(width, height, maxWidth, maxHeight, extra = []) {
-  const logo = await sharp(LOGO)
+/**
+ * Bounds of the diamond mark in the lockup: the first block of artwork rows, which must be followed
+ * by a blank band and then further artwork (the English and Arabic wordmarks) and must be the tallest
+ * part of it. Returns null when the artwork is laid out differently, so no wrong crop is ever made.
+ */
+async function markRegion() {
+  // Flattened on white, so a transparent logo reads the same as one supplied on white.
+  const { data, info } = await sharp(LOGO).flatten({ background: "#ffffff" }).raw().toBuffer({ resolveWithObject: true });
+  const { width, height, channels } = info;
+  const runs = []; // consecutive rows that contain artwork (a pixel whose darkest channel is below 225)
+  for (let y = 0; y < height; y++) {
+    let minX = width;
+    let maxX = -1;
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * channels;
+      if (Math.min(data[i], data[i + 1], data[i + 2]) < 225) {
+        minX = Math.min(minX, x);
+        maxX = x;
+      }
+    }
+    const last = runs.at(-1);
+    if (maxX < 0) continue;
+    if (last && last.bottom === y - 1) Object.assign(last, { bottom: y, minX: Math.min(last.minX, minX), maxX: Math.max(last.maxX, maxX) });
+    else runs.push({ top: y, bottom: y, minX, maxX });
+  }
+  const [mark, ...rest] = runs;
+  const tallest = Math.max(...runs.map((run) => run.bottom - run.top));
+  if (!mark || rest.length === 0 || mark.bottom - mark.top !== tallest) return null;
+  // A few pixels of margin around the artwork keep its anti-aliased edges.
+  const pad = 4;
+  const left = Math.max(0, mark.minX - pad);
+  const top = Math.max(0, mark.top - pad);
+  return { left, top, width: Math.min(width, mark.maxX + pad + 1) - left, height: Math.min(height, mark.bottom + pad + 1) - top };
+}
+
+async function logoOnWhite(width, height, maxWidth, maxHeight, extra = [], region = null) {
+  const logo = await (region ? sharp(LOGO).extract(region) : sharp(LOGO))
     .resize({ width: maxWidth, height: maxHeight, fit: "inside", withoutEnlargement: true })
     .png()
     .toBuffer();
@@ -130,8 +169,10 @@ async function buildBrandAssets() {
     .resize({ height: LOGO_HEIGHT, withoutEnlargement: true })
     .webp({ nearLossless: true, quality: 60 })
     .toFile(LOGO_OUTPUT);
-  await (await logoOnWhite(192, 192, 166, 166)).toFile(path.join(APP_DIR, "icon.png"));
-  await (await logoOnWhite(180, 180, 156, 156)).toFile(path.join(APP_DIR, "apple-icon.png"));
+  const mark = await markRegion();
+  if (!mark) console.warn("Brand: the mark could not be separated from the wordmarks; icons use the full lockup.");
+  await (await logoOnWhite(192, 192, 172, 172, [], mark)).toFile(path.join(APP_DIR, "icon.png"));
+  await (await logoOnWhite(180, 180, 152, 152, [], mark)).toFile(path.join(APP_DIR, "apple-icon.png"));
   await (
     await logoOnWhite(1200, 630, 960, 440, [{ input: spectrumBar(1200, 8), top: 622, left: 0 }])
   ).toFile(path.join(APP_DIR, "opengraph-image.png"));
@@ -139,7 +180,10 @@ async function buildBrandAssets() {
 
   const manifest = { logo: { src: `/images/brand/logo-${LOGO_HEIGHT}.webp`, width: logo.width, height: logo.height } };
   await writeFile(BRAND_MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
-  console.log(`Brand: logo, icons and Open Graph image generated (logo ${logo.width}×${logo.height}).`);
+  console.log(
+    `Brand: logo, icons and Open Graph image generated (logo ${logo.width}×${logo.height}; ` +
+      `icons from ${mark ? `the mark, ${mark.width}×${mark.height} at ${mark.left},${mark.top}` : "the full lockup"}).`,
+  );
 }
 
 const steps = process.argv.slice(2);

@@ -80,7 +80,7 @@ export function MobileMenu({
       <div className="flex h-full flex-col overflow-y-auto">
         <div className="shell-content flex h-16 shrink-0 items-center justify-between">
           <Link href={routes.home} className="rounded-sm">
-            <BrandLogo size="sm" plate />
+            <BrandLogo size="sm" />
           </Link>
           <button
             ref={closeRef}

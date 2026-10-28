@@ -1,15 +1,24 @@
-"use client";
-
-import { useId, useState } from "react";
-import { LazyMotion, MotionConfig, domAnimation, m, useReducedMotion } from "motion/react";
 import { Plus } from "lucide-react";
 
-import { motionTokens } from "@/shared/lib/animation";
 import { cn } from "@/shared/lib/utils";
 
+/*
+ * Each item is a native <details> disclosure: it works without JavaScript, the browser exposes the
+ * expanded state, find-in-page opens a matching answer, and no client code ships. Where
+ * `::details-content` and `interpolate-size` are supported the answer's height and opacity
+ * animate (250 ms; opacity only and 150 ms with reduced motion); elsewhere it opens at once.
+ */
+const itemClasses = [
+  "group/item border-b border-line [interpolate-size:allow-keywords]",
+  "details-content:h-0 details-content:overflow-clip details-content:opacity-0",
+  "details-content:transition-[height,opacity,content-visibility] details-content:transition-discrete details-content:duration-250 details-content:ease-standard",
+  "open:details-content:h-auto open:details-content:opacity-100",
+  "motion-reduce:details-content:transition-[opacity,content-visibility] motion-reduce:details-content:duration-150",
+].join(" ");
+
 /**
- * Disclosure list for FAQs (planning/DESIGN.md §7.4). Collapsed answers stay in the HTML
- * (inert and zero height) so they are indexable and need no extra request.
+ * Disclosure list for FAQs (planning/DESIGN.md §7.4). Answers stay in the HTML, so they are
+ * indexable and need no extra request. Each question is an `h3` inside its `summary`.
  */
 export function Accordion({
   items,
@@ -20,74 +29,26 @@ export function Accordion({
   defaultOpenId?: string;
   className?: string;
 }) {
-  const baseId = useId();
-  const reducedMotion = useReducedMotion();
-  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set(defaultOpenId ? [defaultOpenId] : []));
-
-  const toggle = (id: string) =>
-    setOpenIds((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
   return (
-    <LazyMotion features={domAnimation} strict>
-      <MotionConfig reducedMotion="user">
-        <div className={cn("border-t border-line", className)}>
-          {items.map((item, index) => {
-            const open = openIds.has(item.id);
-            const buttonId = `${baseId}-${item.id}-button`;
-            const panelId = `${baseId}-${item.id}-panel`;
-
-            return (
-              <div key={item.id} className="border-b border-line">
-                <h3>
-                  <button
-                    id={buttonId}
-                    type="button"
-                    aria-expanded={open}
-                    aria-controls={panelId}
-                    onClick={() => toggle(item.id)}
-                    className="group flex w-full items-start gap-5 py-6 text-left"
-                  >
-                    {/* Decorative counter: the question alone names the button. */}
-                    <span aria-hidden className="type-label pt-1.5 text-highlight tabular-nums">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="flex-1 font-display text-heading-sm font-semibold text-ink transition-colors duration-150 group-hover:text-accent-text">
-                      {item.title}
-                    </span>
-                    <Plus
-                      aria-hidden
-                      className={cn(
-                        "mt-0.5 size-5 shrink-0 text-ink-muted transition-transform duration-250 ease-out-expo",
-                        open && "rotate-45",
-                      )}
-                    />
-                  </button>
-                </h3>
-                <m.div
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={buttonId}
-                  inert={!open}
-                  initial={false}
-                  animate={open ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-                  transition={{
-                    duration: reducedMotion ? motionTokens.duration.micro : motionTokens.duration.ui,
-                    ease: motionTokens.bezier.standard,
-                  }}
-                  className="overflow-hidden"
-                >
-                  <div className="max-w-[65ch] pb-7 pl-11 text-body text-ink-muted">{item.content}</div>
-                </m.div>
-              </div>
-            );
-          })}
-        </div>
-      </MotionConfig>
-    </LazyMotion>
+    <div className={cn("border-t border-line", className)}>
+      {items.map((item, index) => (
+        <details key={item.id} open={item.id === defaultOpenId} className={itemClasses}>
+          <summary className="group/summary flex cursor-pointer list-none items-start gap-5 py-6 [&::-webkit-details-marker]:hidden">
+            {/* Decorative counter: the question alone names the control. w-6 + gap-5 = the answer's pl-11. */}
+            <span aria-hidden className="type-label w-6 shrink-0 pt-1.5 text-highlight tabular-nums">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3 className="flex-1 text-heading-sm font-semibold text-ink transition-colors duration-150 group-hover/summary:text-accent-text">
+              {item.title}
+            </h3>
+            <Plus
+              aria-hidden
+              className="mt-0.5 size-5 shrink-0 text-ink-muted transition-transform duration-250 ease-out-expo group-open/item:rotate-45 motion-reduce:transition-none"
+            />
+          </summary>
+          <div className="max-w-[65ch] pb-7 pl-11 text-body text-ink-muted">{item.content}</div>
+        </details>
+      ))}
+    </div>
   );
 }

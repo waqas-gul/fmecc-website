@@ -21,6 +21,7 @@ export function LineReveal({
     if (window.matchMedia(mediaQueries.reduced).matches) return;
     if (scope.getBoundingClientRect().top < window.innerHeight) return;
 
+    gsap.registerPlugin(SplitText);
     SplitText.create(scope, {
       type: "lines",
       mask: "lines",

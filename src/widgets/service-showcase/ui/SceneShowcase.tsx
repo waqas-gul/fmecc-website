@@ -62,7 +62,8 @@ export function SceneShowcase({
   return (
     <div ref={scopeRef} className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-12 lg:gap-8">
       <div ref={visualRef} className="lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:col-span-7 lg:col-start-6 lg:row-start-1 lg:self-start">
-        <figure className="mx-auto w-full max-w-[30rem] lg:max-w-none">
+        {/* lg:w-fit: the figure takes the frame's height-derived width, so the caption starts at the frame's edge. */}
+        <figure className="mx-auto w-full max-w-[30rem] lg:w-fit lg:max-w-full">
           <div className="relative mx-auto aspect-[4/5] w-full lg:h-[min(calc(100svh-var(--header-h)-7rem),48rem)] lg:w-auto lg:max-w-full">
             <LazyScene load={load} poster={poster} label={label} progress={progress} className="h-full w-full" />
             {/* Registration marks at the frame corners: technical detail, not content. */}

@@ -2,7 +2,7 @@ import { ArrowUpRight, Mail, MessageCircle, Phone, type LucideIcon } from "lucid
 
 import { contactLinks, type ContactLink } from "@/shared/config";
 import { cn } from "@/shared/lib/utils";
-import { LinkButton } from "@/shared/ui";
+import { IconTile, LinkButton } from "@/shared/ui";
 
 const icons: Record<ContactLink["kind"], LucideIcon> = { phone: Phone, whatsapp: MessageCircle, email: Mail };
 
@@ -65,9 +65,7 @@ export function ContactChannels({ layout, className }: { layout: "inline" | "sta
                 {...externalProps(link)}
                 className="group flex h-full flex-col gap-6 rounded-md border border-line bg-surface-raised p-6 transition-[border-color] duration-250 hover:border-line-strong lg:p-8"
               >
-                <span aria-hidden className="inline-flex size-10 items-center justify-center rounded-sm border border-line text-highlight">
-                  <Icon className="size-[18px]" />
-                </span>
+                <IconTile icon={Icon} />
                 <span className="flex flex-col gap-2">
                   <span className="type-label text-ink-subtle">{link.label}</span>
                   <span className="text-body font-medium text-ink [overflow-wrap:anywhere] transition-colors duration-150 group-hover:text-accent-text">
@@ -90,9 +88,7 @@ export function ContactChannels({ layout, className }: { layout: "inline" | "sta
         return (
           <li key={link.kind} className="border-b border-line">
             <a href={channelHref(link)} {...externalProps(link)} className="group flex min-h-11 items-center gap-4 rounded-sm py-4">
-              <span aria-hidden className="inline-flex size-10 shrink-0 items-center justify-center rounded-sm border border-line text-highlight">
-                <Icon className="size-[18px]" />
-              </span>
+              <IconTile icon={Icon} />
               <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <span className="type-label text-ink-subtle">{link.label}</span>
                 <span className="text-body font-medium text-ink [overflow-wrap:anywhere] transition-colors duration-150 group-hover:text-accent-text">

@@ -2,7 +2,7 @@ import { Clock, MapPin } from "lucide-react";
 
 import { ContactChannels } from "@/features/contact-channels";
 import { contactLinks, site } from "@/shared/config";
-import { Eyebrow, LinkButton } from "@/shared/ui";
+import { Eyebrow, IconTile, LinkButton } from "@/shared/ui";
 
 // TODO(content): FMECC to confirm how enquiries are handled before these steps go live.
 const NEXT_STEPS = [
@@ -39,8 +39,8 @@ export function ContactPanel() {
         <dl className="flex flex-col gap-6">
           {address && (
             <div className="flex gap-4">
-              <dt className="inline-flex size-10 shrink-0 items-center justify-center rounded-sm border border-line text-highlight">
-                <MapPin aria-hidden className="size-[18px]" />
+              <dt className="shrink-0">
+                <IconTile icon={MapPin} />
                 <span className="sr-only">Office</span>
               </dt>
               <dd className="flex flex-col items-start gap-1">
@@ -58,8 +58,8 @@ export function ContactPanel() {
           )}
           {hours && (
             <div className="flex gap-4">
-              <dt className="inline-flex size-10 shrink-0 items-center justify-center rounded-sm border border-line text-highlight">
-                <Clock aria-hidden className="size-[18px]" />
+              <dt className="shrink-0">
+                <IconTile icon={Clock} />
                 <span className="sr-only">Office hours</span>
               </dt>
               <dd className="flex flex-col gap-1">

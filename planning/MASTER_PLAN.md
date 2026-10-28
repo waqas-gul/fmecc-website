@@ -3,7 +3,7 @@
 Corporate website for **Future Middle East Construction Company (FMECC)**: a frontend-only, statically exported Next.js 16 (App Router) site.
 
 Companion documents: [DESIGN.md](./DESIGN.md) — visual system · [ARCHITECTURE.md](./ARCHITECTURE.md) — code structure and contracts · [CLAUDE.md](../CLAUDE.md) — working rules.
-Planning completed 2026-10-27; the brand palette was approved from the delivered logo the same day (DESIGN.md §2). The foundation (WS-0) and workstreams WS-1 to WS-5 were integrated on `master` on 2026-10-28; Phase 4 (hardening, real content) has not started.
+Planning completed 2026-10-27; the brand palette was approved from the delivered logo the same day (DESIGN.md §2). The foundation (WS-0) and workstreams WS-1 to WS-5 were integrated on `master` on 2026-10-28, and the WS-6 technical hardening pass (performance, accessibility, SEO, visual polish, QA) was completed the same day; real content and media (Phase 4) are still outstanding.
 
 ## 1. Objectives
 
@@ -142,26 +142,31 @@ Performance budgets (gzipped, mobile)
 |------|--------|
 | Core Web Vitals | LCP ≤ 2.5 s, CLS ≤ 0.1, INP ≤ 200 ms on a mid-range Android over 4G |
 | JS shared by every route | Not budgeted, re-measured on every Next/React upgrade: 187 KB (Next 16.4.3 + React 19.3 runtime ≈ 173 KB, header and root layout ≈ 14 KB) |
-| JS per route on top of the shared JS (excluding 3D) | ≤ 60 KB, so ≤ 250 KB in total; GSAP + ScrollTrigger ≤ 45 KB; Motion ≤ 20 KB |
+| JS per route on top of the shared JS (excluding 3D) | ≤ 60 KB, so ≤ 250 KB in total; GSAP + ScrollTrigger ≤ 45 KB, only on routes with scroll choreography; Motion ≤ 20 KB if a component ever needs it (none does since WS-6) |
 | 3D bundle | ≤ 300 KB, loaded only when a scene approaches the viewport, never on first paint |
 | Fonts | ≤ 120 KB total, `display: swap`, self-hosted via `next/font` |
 | Hero image (1920 w) | ≤ 250 KB; card images ≤ 80 KB |
 | Hero video | ≤ 3 MB, loaded after LCP, poster is the LCP element |
 | Lighthouse (mobile) | Performance ≥ 90, Accessibility 100, Best Practices ≥ 95, SEO 100 |
 
-The original "≤ 190 KB total per route" could not hold: the framework alone measured 173 KB in WS-0. The JS rows above were re-stated at integration from these measurements (2026-10-28, gzipped JS referenced by each exported page, static export of `master`):
+The original "≤ 190 KB total per route" could not hold: the framework alone measured 173 KB in WS-0. The JS rows above were re-stated at integration and re-measured after WS-6 (2026-10-28, gzipped JS referenced by each exported page, static export of `master`):
 
-| Route | Total | On top of shared | Status |
-|-------|-------|------------------|--------|
-| `/` | 238.9 KB | 51.9 KB (GSAP chunk 46.3 KB) | within |
-| `/about/` | 237.2 KB | 50.2 KB (GSAP chunk) | within |
-| `/services/` | 235.1 KB | 48.1 KB (GSAP chunk) | within |
-| `/services/<slug>/` (×4) | 279.6 KB | 92.6 KB (GSAP chunk + Motion 39 KB for the FAQ accordion) | **over**: Motion is 19 KB above its budget |
-| `/projects/` | 190.9 KB | 3.9 KB | within |
-| `/contact/` | 194.5 KB | 7.5 KB | within |
-| 3D, on demand only | three + R3F + Drei 233 KB, canvas 6 KB, each scene 7.5–9.1 KB | | within 300 KB |
+| Route | Integration | After WS-6 | On top of shared (after) | Status |
+|-------|-------------|------------|--------------------------|--------|
+| shared by every route | 187.0 KB | 187.1 KB | — | not budgeted |
+| `/` | 238.9 KB | 239.9 KB | 52.8 KB (GSAP + ScrollTrigger + SplitText) | within |
+| `/about/` | 237.3 KB | 235.0 KB | 47.9 KB (GSAP + ScrollTrigger for the process scrub) | within |
+| `/services/` | 235.1 KB | 189.5 KB | 2.4 KB | within |
+| `/services/<slug>/` (×4) | 279.7 KB | 194.8 KB | 7.7 KB (no GSAP, no Motion) | within (was over) |
+| `/projects/` | 190.9 KB | 191.1 KB | 4.0 KB | within |
+| `/contact/` | 194.5 KB | 194.7 KB | 7.6 KB | within |
+| 3D, on demand only | three + R3F + Drei 233.3 KB, canvas 6 KB, each scene 7.5–9.1 KB | unchanged | | within 300 KB |
 
-The GSAP chunk holds GSAP, ScrollTrigger and SplitText (46.3 KB; SplitText is registered for every GSAP route although only Home's statement uses it). Approximate field check on the same build (headless Chrome, 390 px, 4× CPU slowdown, 150 ms RTT, 1.6 Mbps, gzip): LCP 1.1–1.7 s, CLS ≤ 0.002 on Home, About, Services, a service page, Projects and Contact. Lighthouse itself has not been run.
+WS-6 changes behind the numbers: the FAQ accordion became native `<details>` with CSS (Motion, 39 KB, left the bundle entirely); `Reveal` moved from GSAP to IntersectionObserver + the Web Animations API, so pages whose only scroll motion is reveals ship no GSAP (~44 KB); SplitText is registered only by Home's line reveal (−2.6 KB on About). Home grew 0.9 KB because it keeps GSAP for its choreography and also carries the native reveal.
+
+Lab measurements (no field data exists before launch; every figure below is a lab measurement, not real-user Core Web Vitals):
+- Lighthouse 13.6.0, mobile preset with simulated throttling, on a gzip-serving static server: Performance 100 on About, Services, a service page, Projects and Contact; Home 96–100 over three runs (one earlier run scored 88 when the hero lede's opacity entrance delayed LCP; the lede now rises without fading). Accessibility, Best Practices and SEO 100 on every audited route. Desktop preset: 100 in all four categories on Home, a service page, Projects and Contact. Simulated LCP 0.76–1.53 s, TBT 16–196 ms, CLS ≤ 0.003.
+- Headless Chrome with DevTools throttling (390 px, 4× CPU, 150 ms RTT, 1.6 Mbps, gzip; two runs each, integration → WS-6): LCP Home 1.10 → 1.07–1.14 s, inner pages 1.56–1.70 s on both builds (network-bound); TBT on a service page 72–108 → 18–25 ms, Services overview 36–40 → 6–13 ms, Home 437–648 → 355–503 ms; CLS ≤ 0.004 everywhere. Interaction latency (Event Timing, the data INP uses) stayed below 200 ms for every control: FAQ 16–40 ms (was 48–104 ms), Services menu 72 ms, mobile menu 136–184 ms.
 
 Third-party scripts: none by default. Analytics only through `next/script` with `afterInteractive` behind `NEXT_PUBLIC_ANALYTICS_ID`.
 
@@ -223,7 +228,7 @@ Items FMECC must supply before launch; each maps to a single file so replacement
 
 | Item | Where it lives |
 |------|----------------|
-| Logo SVG master and inverse (white wordmark) variant; `logo.png` already received | `public/images/brand/` |
+| Logo SVG master and inverse (white wordmark) variant; transparent `logo.png` already received (its wordmarks disappear on dark surfaces, DESIGN.md §2.1) | `public/images/brand/` |
 | Company description, values, process wording | `src/entities/company/data/company.ts` |
 | Phone, WhatsApp, email, address, hours, social links, website URL | `src/shared/config/site.ts` |
 | Service copy, scope, FAQs | `src/entities/service/data/<slug>.ts` |

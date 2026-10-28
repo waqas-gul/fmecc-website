@@ -17,6 +17,9 @@ import { HeroMotion } from "./HeroMotion";
  */
 const fadeUp =
   "transition-[opacity,translate] duration-600 ease-out-expo starting:translate-y-4 starting:opacity-0 motion-reduce:transition-none";
+// The lede is the LCP element at phone widths: it rises without fading, so it paints on the first
+// frame instead of waiting for an opacity transition (Chrome does not count opacity-0 paints for LCP).
+const riseUp = "transition-[translate] duration-600 ease-out-expo starting:translate-y-4 motion-reduce:transition-none";
 const delay = (ms: number) => ({ transitionDelay: `${ms}ms` });
 
 // Quick-link cells: two columns below 1024 px, four in a row above, separated by 1 px rules.
@@ -68,7 +71,7 @@ export function HomeHero() {
             ))}
           </h1>
 
-          <p className={cn("mt-6 max-w-[56ch] text-body-lg text-ink-muted", fadeUp)} style={delay(320)}>
+          <p className={cn("mt-6 max-w-[56ch] text-body-lg text-ink-muted", riseUp)} style={delay(320)}>
             {heroContent.lede}
           </p>
 

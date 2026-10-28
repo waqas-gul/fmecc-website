@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 
 import type { Service } from "@/entities/service";
-import { Reveal, Section, SectionHeader } from "@/shared/ui";
+import { IconTile, Reveal, Section, SectionHeader } from "@/shared/ui";
 
 /**
  * Service page section 3 (planning/DESIGN.md §9.1): scope items as a feature grid
@@ -24,9 +24,7 @@ export function ServiceScope({ service }: { service: Service }) {
           const Icon = item.icon ?? service.icon;
           return (
             <Reveal as="li" key={item.title} delay={(index % 3) * 0.08} className="flex flex-col border-t border-line pt-6">
-              <span className="inline-flex size-10 items-center justify-center rounded-sm border border-line text-highlight">
-                <Icon aria-hidden className="size-5" />
-              </span>
+              <IconTile icon={Icon} />
               <h3 className="mt-6 font-display text-heading-sm font-semibold">{item.title}</h3>
               <p className="mt-3 max-w-[48ch] text-body text-ink-muted">{item.description}</p>
             </Reveal>

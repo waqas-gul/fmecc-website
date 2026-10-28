@@ -18,10 +18,11 @@ Avoid: gradients anywhere other than the spectrum rule (§2.4), glassmorphism ev
 ## 2. Brand colours and design tokens
 
 ### 2.1 Logo
-- File: `public/images/brand/logo.png`. The lockup is a diamond-shaped node-and-line mark (purple → royal blue → cyan, left to right) above the English wordmark and the Arabic name, both in royal blue, on white. Keep the lockup intact; never recolour, stretch or separate the mark, the English and the Arabic. The magenta node at the mark's left edge is artwork only; magenta is not a UI colour.
-- Request from FMECC: an SVG master and an inverse version (white wordmark, same mark) for dark surfaces. The royal-blue wordmark fails contrast on Deep Navy (≈ 2.6:1), so until the inverse arrives, dark surfaces (overlay header over the hero, footer) show the logo on a white plate with radius `sm` and 12 px padding.
+- File: `public/images/brand/logo.png`, a transparent PNG supplied by FMECC (replaced the white-background original on 2026-10-28). The lockup is a diamond-shaped node-and-line mark (purple → royal blue → cyan, left to right) above the English wordmark and the Arabic name, both in royal blue. Keep the lockup intact; never recolour, stretch or separate the mark, the English and the Arabic. The magenta node at the mark's left edge is artwork only; magenta is not a UI colour.
+- The logo sits directly on every surface, without a plate. On dark schemes (overlay header over the hero, mobile menu, footer) the mark carries the identity: the wordmarks (`#0003B2`) are 1.48:1 on Deep Navy and effectively disappear, while the legal name stays readable in the image alt and the footer text. Logotypes are exempt from WCAG 1.4.3, but FMECC should still supply an SVG master and an inverse version (white wordmark, same mark) for dark surfaces.
 - Clear space: the height of the English cap letters on all sides. Minimum height 32 px (mobile header), 40 px (desktop header), 48 px (footer). The mark's thin lines and small nodes need the PNG served at 2× its displayed size.
 - Serve brand assets with `<Image unoptimized>` (or `<img>` for SVG); they bypass the responsive image pipeline.
+- Icons (favicon, Apple touch icon) are the one exception to "never separate": the wordmarks are unreadable below ~48 px, so `npm run images` crops the diamond mark out of the supplied lockup (a pure crop, never redrawn or recoloured) and centres it on white. The Open Graph image and every on-page use keep the full lockup. Replace the crop with FMECC's approved mark-only artwork when it is supplied.
 
 ### 2.2 Approved palette
 Derived from the logo and approved on 2026-10-27. The five approved colours are the anchors; the surrounding steps exist only so text, fills and hover states meet contrast (§13) on every scheme. No other hues (gold, amber, magenta, green) are introduced anywhere.
@@ -138,7 +139,7 @@ Rules: body measure ≤ 65ch, display measure ≤ 20ch, headings in `font-displa
 - Grid: 12 columns ≥ 1024, 6 columns ≥ 640, 4 columns below. Gaps 16 / 24 / 32 px.
 - Section rhythm: vertical padding `clamp(4rem, 8vw, 8rem)`; `sm` variant `clamp(2.5rem, 5vw, 4rem)`. Adjacent sections with the same scheme share a 1 px `line` divider; scheme changes need no divider.
 - Hero heights: Home `min-height: 100svh`; page heros `min-height: 60svh` (desktop) / `auto` (mobile) with the media as a 16:9 block.
-- Decorative column guides on dark sections: 1 px lines at grid columns, `line` colour at 50 % opacity, `aria-hidden`, hidden below 1024 px.
+- Decorative column guides on dark sections: one 1 px line on each column's start edge (where content aligns) plus one closing the last column, `line` colour at 50 % opacity, `aria-hidden`, hidden below 1024 px.
 - Sticky header offset: 80 px desktop, 64 px mobile (`scroll-padding-top` on `html`).
 
 ## 5. Responsive breakpoints
@@ -150,15 +151,15 @@ Tailwind v4 defaults: `sm 640`, `md 768`, `lg 1024`, `xl 1280`, `2xl 1536`. Desi
 ### 6.1 Header (`SiteHeader`)
 - Height 80 px desktop / 64 px mobile. Two variants: `overlay` (transparent over a dark hero, white ink) and `solid` (light surface, 1 px bottom line).
 - On scroll past 24 px: becomes compact (64 px), light surface at 92 % with `backdrop-blur`, `raised` shadow, ink flips to dark. Hides on scroll-down, reveals on scroll-up (desktop and mobile), always visible when the menu is open.
-- Left: logo lockup (on a white plate in the `overlay` variant until the inverse logo exists, §2.1). Centre: primary nav — Services (dropdown listing the four services with icon, name and one-line summary), Projects, About, Contact. Right: phone icon link (only if `site.contact.phone` exists) and the primary CTA "Request a quotation" → `/contact/#quote`.
+- Left: logo lockup (transparent, no plate, §2.1). Centre: primary nav — Services (dropdown listing the four services with icon, name and one-line summary), Projects, About, Contact. Right: phone icon link (only if `site.contact.phone` exists) and the primary CTA "Request a quotation" → `/contact/#quote`.
 - Services dropdown: opens on hover and on click/Enter, closes on Escape and outside click, arrow-key navigable, `aria-expanded`, `aria-controls`.
 - Mobile (< 1024): hamburger → full-screen overlay panel (scheme `brand`): staggered large links (`display-lg`), services as an indented group, contact row (phone, WhatsApp, email) and the CTA pinned at the bottom. Focus trapped, body scroll locked, Escape closes, returns focus to the trigger.
 - Active route underlined with a 2 px accent bar; `aria-current="page"`.
 - Skip link is the first focusable element on every page.
 
 ### 6.2 Footer (`SiteFooter`)
-- Scheme `brand`. Top row: logo on a white plate (§2.1), one-line company description, address (if supplied).
-- Four columns ≥ 1024, two at ≥ 640, one below: Services (four links), Company (About, Projects, Contact), Contact (phone, WhatsApp, email, hours — only existing values), and the CTA block ("Have a project in mind?" + button).
+- Scheme `brand`. Top row: logo (§2.1), one-line company description, address (if supplied).
+- Four columns ≥ 1024, two at ≥ 640, one below: Services (four links), Company (About, Projects, Contact), Contact (phone, WhatsApp, email, hours — only existing values), and the CTA block ("Have a project in mind?" + an `outline` button: the CTA band directly above already carries the view's primary quote button).
 - Bottom bar: © year (computed at build), legal name, privacy link (only if the page exists), back-to-top link.
 - Optional watermark: oversized "FMECC" wordmark at 4 % opacity behind the columns, hidden below 1024 px.
 
@@ -187,7 +188,7 @@ Inputs 48 px tall, 1 px `line-strong` border, radius `sm`, `surface` background,
 
 ### 7.4 Other
 - **Badge**: `label` typography, 1 px border, radius `full`, tones `neutral | accent | brand`.
-- **Accordion**: 1 px rules between items, mono index, plus/minus icon rotating 45°, content height animates 250 ms; one open by default on FAQ.
+- **Accordion**: native `<details>`/`<summary>` (works without JavaScript; find-in-page opens a match), 1 px rules between items, mono index, plus icon rotating 45°, content height and opacity animate 250 ms where `::details-content` is supported (opacity only, 150 ms, with reduced motion; elsewhere it opens at once); one open by default on FAQ.
 - **Breadcrumbs**: `body-sm`, separators "/", current item `aria-current="page"`.
 
 ## 8. Homepage design specification
@@ -238,7 +239,7 @@ Service pages share identical rhythm and components; only media, showcase and co
 
 1. **Purpose first** — animation explains structure (reveal along a line, assemble a tower) or confirms interaction. If removing it loses nothing, remove it.
 2. **Budget** — per view: one cinematic sequence (hero or showcase), ambient reveals, micro-interactions. Never more than one scroll-pinned section in the viewport at a time.
-3. **Library split** — GSAP + ScrollTrigger for scroll-driven and timeline work (reveals, pin/scrub, horizontal gallery, SplitText headlines); Motion (`motion/react`) for UI state transitions that need height or layout animation (accordion, filter chips); CSS transitions with `@starting-style` for the header dropdown and mobile menu, so no animation library ships on every page; React 19.3 `ViewTransition` for route cross-fades. One engine per element, never both.
+3. **Library split** — GSAP + ScrollTrigger only for scroll choreography (hero parallax, SplitText headlines, the process fill and scrub, the services switcher, the horizontal gallery); `fade-up` reveals with the Web Animations API and IntersectionObserver, so pages whose only scroll motion is reveals ship no animation library; the accordion is native `<details>` animated with CSS; CSS transitions with `@starting-style` for the header dropdown and mobile menu, so no animation library ships on every page; React 19.3 `ViewTransition` for route cross-fades. Motion (`motion/react`) remains approved for a future component that needs layout animation, but none uses it today. One engine per element, never both.
 4. **Reveal catalogue** — `fade-up` (y 24 px → 0, 600 ms `out-expo`, stagger 80 ms), `line-reveal` for headlines (SplitText lines, mask overflow), `media-scale` (1.08 → 1), `rule-draw` (scaleX 0 → 1 for dividers), `count-fill` for process steps. Everything else needs a design reason.
 5. **Scroll choreography** — ScrollTrigger `start: "top 80%"` for reveals; pinned sections use `scrub: 0.6` and `anticipatePin: 1`; pin durations ≤ 150 % of viewport height; no pinning below 1024 px except the horizontal gallery which becomes native scroll.
 6. **Native scrolling only** — no smooth-scroll or scroll-jacking libraries; wheel and touch behave normally.
@@ -281,7 +282,7 @@ Originals live in `media-src/<section>/<name>.jpg`; `npm run images` writes `pub
 - Never autoplay with sound; never rely on video to convey text.
 
 ### 12.4 Placeholders
-Until real media arrives, use in-repo neutral placeholders (flat `navy-800` panels with the mono label "Media placeholder") flagged `placeholder: true` in data so they are easy to find and impossible to ship unnoticed.
+Until real media arrives, use in-repo neutral placeholders (flat `navy-800` panels with a faint 40 px drafting grid, a short cyan rule and the mono label "Media placeholder", followed from 640 px up by the intended shot, which is the asset's alt text) flagged `placeholder: true` in data so they are easy to find and impossible to ship unnoticed. Each panel doubles as the brief for the photo that replaces it.
 
 ## 13. Accessibility and reduced motion
 

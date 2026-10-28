@@ -1,7 +1,6 @@
-import { Section, SectionHeader } from "@/shared/ui";
+import { IconTile, Section, SectionHeader } from "@/shared/ui";
 
 import { aboutContent } from "../data/about";
-import { IconTile } from "./IconTile";
 
 /** Quality and safety principles in two ruled columns (generic HSE commitment, planning/MASTER_PLAN.md §3). */
 export function AboutStandards() {

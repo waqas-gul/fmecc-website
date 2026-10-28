@@ -3,7 +3,7 @@ export const motionTokens = {
   duration: { micro: 0.15, ui: 0.25, reveal: 0.6, cinematic: 1.2 },
   /** GSAP ease names matching the CSS easing tokens. */
   ease: { outExpo: "expo.out", inOutQuart: "power3.inOut", standard: "power2.out" },
-  /** Cubic-bezier tuples of the same easings, for Motion. */
+  /** Cubic-bezier tuples of the same easings, for the Web Animations API. */
   bezier: {
     outExpo: [0.16, 1, 0.3, 1],
     inOutQuart: [0.76, 0, 0.24, 1],

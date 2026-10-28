@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import { routes } from "@/shared/config";
 import { cn } from "@/shared/lib/utils";
-import { MediaImage } from "@/shared/ui";
+import { IconTile, MediaImage } from "@/shared/ui";
 
 import type { Service } from "../model/types";
 
@@ -40,9 +40,7 @@ export function ServiceCard({
           />
         </div>
       ) : (
-        <span className="mx-6 mt-6 inline-flex size-10 items-center justify-center rounded-sm border border-line text-highlight lg:mx-8 lg:mt-8">
-          <Icon aria-hidden className="size-5" />
-        </span>
+        <IconTile icon={Icon} className="mx-6 mt-6 lg:mx-8 lg:mt-8" />
       )}
       <div className="flex flex-1 flex-col gap-3 p-6 lg:p-8">
         <span className="type-label text-highlight tabular-nums">{String(service.index).padStart(2, "0")}</span>

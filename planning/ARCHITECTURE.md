@@ -9,7 +9,7 @@ Code structure, boundaries and contracts for the FMECC site. Read with [MASTER_P
 | Framework | Next.js 16.4.3, App Router, Turbopack (default), React 19.3, TypeScript 5.9 strict |
 | Styling | Tailwind CSS v4 through the `@tailwindcss/turbopack` loader rule in `next.config.ts`; tokens in `src/shared/styles/tokens.css` (approved palette and semantic tokens: DESIGN.md §2) |
 | Output | **Static export** (`output: 'export'`) to `out/`, deployable to any static host |
-| Animation | `gsap` (+ `ScrollTrigger`, `SplitText` — bundled and free in gsap ≥ 3.13) from `@/shared/lib/gsap`, `motion` (`motion/react`) for UI transitions that need height or layout animation, CSS transitions for the header, React 19.3 `ViewTransition` for route transitions |
+| Animation | `gsap` (+ `ScrollTrigger`, `SplitText` — bundled and free in gsap ≥ 3.13) from `@/shared/lib/gsap` for scroll choreography only; the Web Animations API with IntersectionObserver for fade-up reveals (`Reveal`); native `<details>` with CSS for the accordion; CSS transitions for the header; React 19.3 `ViewTransition` for route transitions. `motion` (`motion/react`) stays approved for future layout animation but is currently imported nowhere (WS-6) |
 | 3D | `three`, `@react-three/fiber` (v9, React 19 compatible), `@react-three/drei` (v10), `@types/three` |
 | Icons | `lucide-react` (already in Next's default `optimizePackageImports`) |
 | Images | `next/image` with a custom loader + `scripts/optimize-images.mjs` using `sharp` (present as a Next dependency; declare it explicitly as a devDependency) |
@@ -55,7 +55,7 @@ src/
     page.tsx                   Home
     globals.css                @import "tailwindcss"; tokens.css; base.css
     not-found.tsx
-    icon.png  apple-icon.png  opengraph-image.png
+    icon.png  apple-icon.png  opengraph-image.png   icons: the diamond mark cropped from the lockup; OG: full lockup
     robots.ts  sitemap.ts      export const dynamic = 'force-static'
     about/page.tsx
     services/page.tsx
@@ -80,10 +80,10 @@ src/
   shared/
     ui/        Button, LinkButton, Container, Section, SectionHeader, Eyebrow, Card, Badge, Accordion,
                Reveal, MediaImage, VideoBackground, Breadcrumbs, SkipLink, VisuallyHidden, Stat,
-               FormField, Input, Select, Textarea, Checkbox, BrandLogo, ColumnGuides   (index.ts)
+               FormField, Input, Select, Textarea, Checkbox, BrandLogo, ColumnGuides, IconTile   (index.ts)
     config/    site.ts  navigation.ts  routes.ts  brand.ts  brand-assets.json (written by `npm run images`)
     lib/       animation/ (tokens.ts, useReducedMotion.ts)       GSAP-free
-               gsap/ (gsap.ts, useGsap.ts)                        GSAP registered once
+               gsap/ (gsap.ts, useGsap.ts)                        ScrollTrigger registered once
                media/ (image-loader.ts, placeholders.ts)
                seo/ (metadata.ts, structured-data.ts, JsonLd.tsx, url.ts)
                utils/ (cn.ts, device.ts)
@@ -117,7 +117,7 @@ Default to Server Components. Mark a file `'use client'` only for state, effects
 
 | Server | Client |
 |--------|--------|
-| All `app/` pages and layouts, `Section`, `Container`, `SectionHeader`, `Eyebrow`, `Card`, `Badge`, `Breadcrumbs`, `Stat`, `MediaImage`, `ServiceCard`, `ProjectCard`, `ContactChannels`, `SiteFooter`, `CtaBand`, `PageHero`, all `service-detail` and `project-detail` sections | `SiteHeader` (scroll and menu state), `Reveal`, `VideoBackground`, `Accordion`, `QuoteRequestForm`, `ProjectFilter`, `LazyScene` and scenes, `HomeHero` motion layer, `ServicesShowcase` switcher, `FeaturedProjects` gallery, `ProcessSection` scrub |
+| All `app/` pages and layouts, `Section`, `Container`, `SectionHeader`, `Eyebrow`, `Card`, `Badge`, `Breadcrumbs`, `Stat`, `MediaImage`, `IconTile`, `Accordion` (native `<details>`), `ServiceCard`, `ProjectCard`, `ContactChannels`, `SiteFooter`, `CtaBand`, `PageHero`, all `service-detail` and `project-detail` sections | `SiteHeader` (scroll and menu state), `Reveal`, `VideoBackground`, `QuoteRequestForm`, `ProjectFilter`, `LazyScene` and scenes, `HomeHero` motion layer, `ServicesShowcase` switcher, `FeaturedProjects` gallery, `ProcessSection` scrub |
 
 Rules
 - Client components receive serializable props only (no functions, no class instances, no React elements other than `children`).
@@ -133,6 +133,7 @@ Public API of `src/shared/ui/index.ts` (props are exact; add props only through 
 ```ts
 import type { Route } from 'next';
 import type { ImageProps } from 'next/image';
+import type { LucideIcon } from 'lucide-react';
 import type { ImageAsset, VideoAsset } from '@/shared/types/media';
 import type { Scheme } from '@/shared/types/scheme';            // 'light' | 'dark' | 'brand'
 
@@ -156,8 +157,8 @@ export function SectionHeader(props: { eyebrow?: string; index?: number; title: 
 export function Eyebrow(props: { index?: number; className?: string; children: React.ReactNode }): React.JSX.Element;
 export function Card(props: { as?: 'article' | 'div' | 'li'; href?: Route; interactive?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element;
 export function Badge(props: { tone?: 'neutral' | 'accent' | 'brand'; children: React.ReactNode }): React.JSX.Element;
-export function Accordion(props: { items: { id: string; title: string; content: React.ReactNode }[]; defaultOpenId?: string; className?: string }): React.JSX.Element;   // client
-export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; reduced-motion aware
+export function Accordion(props: { items: { id: string; title: string; content: React.ReactNode }[]; defaultOpenId?: string; className?: string }): React.JSX.Element;   // server; native <details>/<summary> with an h3 per question, works without JS, CSS height animation where supported
+export function Reveal(props: { as?: 'div' | 'span' | 'li' | 'section'; delay?: number; y?: number; stagger?: number; once?: boolean; className?: string; children: React.ReactNode }): React.JSX.Element; // client; IntersectionObserver + Web Animations API (no GSAP); reduced-motion aware; focus inside finishes it
 export function MediaImage(props: Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & { asset: ImageAsset; sizes: string }): React.JSX.Element;
 export function VideoBackground(props: { video: VideoAsset; overlay?: 'none' | 'dark' | 'brand'; preload?: boolean; className?: string }): React.JSX.Element;  // client; poster fallback, lazy, pause control; `preload` only when the poster is the page's LCP image (heroes)
 export function Breadcrumbs(props: { items: { label: string; href?: Route }[]; className?: string }): React.JSX.Element;  // renders BreadcrumbList JSON-LD
@@ -170,8 +171,10 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement> & { 
 export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }): React.JSX.Element;
 export function Checkbox(props: React.InputHTMLAttributes<HTMLInputElement> & { label: React.ReactNode; invalid?: boolean }): React.JSX.Element;
 // Added in WS-0 (header, footer and section chrome need them):
-export function BrandLogo(props: { size?: 'sm' | 'md' | 'lg'; plate?: boolean; className?: string }): React.JSX.Element;  // logo as supplied, or the marked text fallback
+export function BrandLogo(props: { size?: 'sm' | 'md' | 'lg'; className?: string }): React.JSX.Element;  // transparent logo as supplied, or the marked text fallback
 export function ColumnGuides(props: { className?: string }): React.JSX.Element;                                          // decorative 12-column guides
+// Added in WS-6 (one tile instead of eight copies across six widgets):
+export function IconTile(props: { icon: LucideIcon; className?: string }): React.JSX.Element;                          // 40 px tile, 20 px cyan glyph, aria-hidden
 ```
 `className` on shared components is for layout. To hide one responsively use variant utilities (`max-lg:hidden`), never base display classes such as `hidden`, which lose to the component's own `inline-flex`. Inside `FormField`, controls receive `id`, `aria-describedby`, `aria-invalid` and `required` automatically.
 
@@ -179,10 +182,10 @@ export function ColumnGuides(props: { className?: string }): React.JSX.Element; 
 ```ts
 // '@/shared/lib/animation' — GSAP-free, safe to import anywhere
 export function useReducedMotion(): boolean;
-export const motionTokens: { duration: { micro: 0.15; ui: 0.25; reveal: 0.6; cinematic: 1.2 }; ease: { outExpo: string; inOutQuart: string; standard: string }; bezier: { outExpo; inOutQuart; standard } }; // ease = GSAP names, bezier = Motion tuples
+export const motionTokens: { duration: { micro: 0.15; ui: 0.25; reveal: 0.6; cinematic: 1.2 }; ease: { outExpo: string; inOutQuart: string; standard: string }; bezier: { outExpo; inOutQuart; standard } }; // ease = GSAP names, bezier = tuples for the Web Animations API
 export const mediaQueries: { reduced: string; motionOk: string; md: string; lg: string };
 // '@/shared/lib/gsap' — import only in client components that animate with GSAP
-export { gsap, ScrollTrigger, SplitText };                            // registered once in gsap.ts
+export { gsap, ScrollTrigger, SplitText };                            // ScrollTrigger registered once in gsap.ts; SplitText is tree-shaken where unused, so its one user (LineReveal) registers it before splitting
 export function useGsap<T extends HTMLElement = HTMLDivElement>(setup: (ctx: gsap.Context, scope: T) => void, deps?: readonly unknown[]): React.RefObject<T | null>;
 // '@/shared/lib/media'
 export default function imageLoader(p: { src: string; width: number; quality?: number }): string;   // '/images/a/b.webp' → '/images/a/b-<width>.webp'
@@ -366,8 +369,8 @@ Checklist
 | Images | Originals in `media-src/`; `npm run images` writes `public/images/**/<name>-<w>.webp` for widths 320, 480, 640, 960, 1280, 1600, 1920 (no enlargement) plus `<name>.webp` at the largest size. `MediaImage` requires `sizes`; only the page's LCP image sets `preload`; all others lazy-load (default) |
 | Video | `VideoBackground`: `preload="none"`, sources attached when within one viewport and `prefers-reduced-motion: no-preference`; paused off-screen; poster always rendered first |
 | 3D | `LazyScene` dynamic-imports a scene module (its own chunk) on approach; three, R3F and Drei are therefore never in the initial bundle. One canvas per page; `frameloop="demand"`; dispose on unmount |
-| GSAP | Registered once in `shared/lib/gsap/gsap.ts`; client components import from `@/shared/lib/gsap` only, so GSAP ships only on routes that use it; `ScrollTrigger.refresh()` after `document.fonts.ready` and on image load inside pinned sections |
-| Motion | `motion/react` with `LazyMotion` + `m` only in components that need height or layout animation (accordion, filter chips). The header uses CSS transitions and `@starting-style`, keeping Motion off the every-page bundle |
+| GSAP | ScrollTrigger registered once in `shared/lib/gsap/gsap.ts`; client components import from `@/shared/lib/gsap` only, so GSAP ships only on routes that use it: Home, About (process scrub). Reveals use the Web Animations API, so the services overview and the four service pages ship no GSAP. `ScrollTrigger.refresh()` after `document.fonts.ready` and on image load inside pinned sections |
+| Motion | Not imported anywhere since WS-6: the FAQ accordion is native `<details>` with CSS, and the project filter needs no layout animation. If a future component needs layout animation, use `motion/react` with `LazyMotion` + `m` in that component only. The header uses CSS transitions and `@starting-style` |
 | Icons | Named imports from `lucide-react` |
 | Scripts | None by default; analytics via `next/script` `afterInteractive` only when `NEXT_PUBLIC_ANALYTICS_ID` is set |
 

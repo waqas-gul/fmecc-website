@@ -24,7 +24,7 @@ export function SiteFooter() {
       <Container className="relative pt-16 pb-10 lg:pt-24">
         <div className="flex flex-col gap-6 border-b border-line pb-12 lg:flex-row lg:items-end lg:justify-between">
           <Link href={routes.home} className="self-start rounded-sm">
-            <BrandLogo size="lg" plate />
+            <BrandLogo size="lg" />
           </Link>
           <p className="max-w-md text-body-sm text-ink-muted">{site.description}</p>
         </div>
@@ -70,7 +70,8 @@ export function SiteFooter() {
 
           <div className="flex flex-col items-start gap-6">
             <h2 className="font-display text-heading-sm font-semibold">Have a project in mind?</h2>
-            <LinkButton href={routes.quote()} icon={<ArrowRight />}>
+            {/* Outline: the CTA band directly above already carries the page's primary quote button (DESIGN.md §7.1). */}
+            <LinkButton href={routes.quote()} variant="outline" icon={<ArrowRight />}>
               Request a quotation
             </LinkButton>
           </div>

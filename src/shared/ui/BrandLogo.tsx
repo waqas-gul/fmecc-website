@@ -11,19 +11,11 @@ const heightClasses = {
 
 /**
  * FMECC logo lockup exactly as supplied, never recoloured or separated (planning/DESIGN.md §2.1).
- * `plate` puts it on a white plate for dark surfaces until an inverse version exists.
+ * The supplied PNG is transparent, so it sits directly on every surface.
  * Until public/images/brand/logo.png is added and `npm run images` has run, a clearly marked
  * temporary text logo is rendered instead; it is not a redrawn logo.
  */
-export function BrandLogo({
-  size = "md",
-  plate = false,
-  className,
-}: {
-  size?: keyof typeof heightClasses;
-  plate?: boolean;
-  className?: string;
-}) {
+export function BrandLogo({ size = "md", className }: { size?: keyof typeof heightClasses; className?: string }) {
   if (!brandLogo) {
     return (
       <span
@@ -42,7 +34,7 @@ export function BrandLogo({
   }
 
   return (
-    <span className={cn("inline-flex", plate && "rounded-sm bg-white p-3", className)}>
+    <span className={cn("inline-flex", className)}>
       <Image
         src={brandLogo.src}
         alt={brandLogo.alt}
