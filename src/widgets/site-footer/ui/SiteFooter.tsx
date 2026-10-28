@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUp } from "lucide-react";
 
-import { contactLinks, footerNav, routes, site } from "@/shared/config";
-import { BrandLogo, ColumnGuides, Container, LinkButton } from "@/shared/ui";
+import { contactLinks, demoContactItems, footerNav, routes, site } from "@/shared/config";
+import { Badge, BrandLogo, ColumnGuides, Container, LinkButton } from "@/shared/ui";
 
 // 44 px tall rows: the links are touch targets (planning/DESIGN.md §5), so the rows carry the spacing.
 const linkClasses = "inline-flex min-h-11 items-center rounded-sm text-body-sm text-ink-muted transition-colors duration-150 hover:text-ink";
 
-/** Site footer on the brand scheme (planning/DESIGN.md §6.2). Contact details render only when supplied. */
+/**
+ * Site footer on the brand scheme (planning/DESIGN.md §6.2). Contact details render only when supplied;
+ * until then, TEMPORARY sample details (site.demoContact) show as labelled text.
+ */
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
@@ -47,6 +50,11 @@ export function SiteFooter() {
 
           <div>
             <h2 className="type-label text-ink-subtle">Contact</h2>
+            {demoContactItems.length > 0 && (
+              <div className="mt-4">
+                <Badge>Sample details</Badge>
+              </div>
+            )}
             <ul className="mt-2 flex flex-col">
               {contactLinks.map((link) => (
                 <li key={link.kind}>
@@ -62,6 +70,13 @@ export function SiteFooter() {
               {site.contact.hours && (
                 <li className="py-3 text-body-sm whitespace-pre-line text-ink-muted">{site.contact.hours}</li>
               )}
+              {/* TEMPORARY sample details (site.demoContact): plain text, never links. */}
+              {demoContactItems.map((item) => (
+                <li key={item.kind} className="flex flex-col gap-1 py-2 text-body-sm text-ink-muted">
+                  <span className="type-label text-ink-subtle">{item.label}</span>
+                  <span className="whitespace-pre-line">{item.value}</span>
+                </li>
+              ))}
               {contactLinks.length === 0 && (
                 <li>
                   <Link href={routes.contact} className={linkClasses}>

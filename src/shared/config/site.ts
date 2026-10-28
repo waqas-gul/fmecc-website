@@ -13,6 +13,8 @@ export interface SiteConfig {
     hours: string | null;
     mapsUrl: string | null;
   };
+  /** TEMPORARY sample details for development: labelled text only, never links, form delivery or structured data. */
+  demoContact: { phone: string; whatsapp: string; email: string; address: string; hours: string } | null;
   social: { linkedin: string | null; instagram: string | null; x: string | null };
   formEndpoint: string | null;
   analyticsId: string | null;
@@ -38,6 +40,19 @@ export const site: SiteConfig = {
   // - email: one plain address; mapsUrl: an https:// Google Maps share link;
   // - address and hours: plain text; "\n" starts a new line.
   contact: { phone: null, whatsapp: null, email: null, address: null, hours: null, mapsUrl: null },
+  // TODO(content): TEMPORARY demo details so development can continue; set to null before launch.
+  // They are fictional (a reserved 555-01xx number and the reserved example.com domain). The Contact
+  // page and the footer show them as text labelled "Sample details", never as links. The header, CTA
+  // band, quotation form and structured data ignore them, and the form stays in demo mode (nothing is
+  // sent) until NEXT_PUBLIC_FORM_ENDPOINT is set. They hide by themselves once any real value is in
+  // `contact` above.
+  demoContact: {
+    phone: "+1 202-555-0147",
+    whatsapp: "Demo placeholder only",
+    email: "hello@example.com",
+    address: "FMECC Office — Address To Be Confirmed",
+    hours: "Monday–Friday, 9 AM–5 PM (sample)",
+  },
   social: { linkedin: null, instagram: null, x: null },
   formEndpoint: fromEnv(process.env.NEXT_PUBLIC_FORM_ENDPOINT),
   analyticsId: fromEnv(process.env.NEXT_PUBLIC_ANALYTICS_ID),
@@ -60,6 +75,25 @@ if (email) links.push({ kind: "email", label: "Email", value: email, href: `mail
 
 /** Direct contact channels that exist in `site.contact`, in display order. */
 export const contactLinks: readonly ContactLink[] = links;
+
+export interface DemoContactItem {
+  kind: "phone" | "whatsapp" | "email" | "address" | "hours";
+  label: string;
+  value: string;
+}
+
+const demo = Object.values(site.contact).some(Boolean) ? null : site.demoContact;
+
+/** `site.demoContact` as labelled display text, in order; empty once any real contact detail is set. */
+export const demoContactItems: readonly DemoContactItem[] = demo
+  ? [
+      { kind: "phone", label: "Phone", value: demo.phone },
+      { kind: "whatsapp", label: "WhatsApp", value: demo.whatsapp },
+      { kind: "email", label: "Email", value: demo.email },
+      { kind: "address", label: "Office", value: demo.address },
+      { kind: "hours", label: "Office hours", value: demo.hours },
+    ]
+  : [];
 
 const digitCount = (value: string) => value.replace(/\D/g, "").length;
 

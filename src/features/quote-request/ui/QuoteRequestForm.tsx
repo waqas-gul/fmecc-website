@@ -16,6 +16,7 @@ export function QuoteRequestForm({ defaultService, id = "quote" }: { defaultServ
       services={services.map(({ slug, name, shortName }) => ({ slug, name, shortName }))}
       endpoint={site.formEndpoint}
       email={site.contact.email}
+      demo={site.demoContact !== null}
       channels={contactLinks}
     />
   );

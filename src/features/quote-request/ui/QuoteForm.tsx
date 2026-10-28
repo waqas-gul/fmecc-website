@@ -23,7 +23,7 @@ import {
   type QuoteValues,
 } from "../model/quote";
 
-type Status = "idle" | "submitting" | "sent" | "handoff" | "failed";
+type Status = "idle" | "submitting" | "sent" | "handoff" | "demo" | "failed";
 
 const SEND_TIMEOUT_MS = 15_000;
 
@@ -66,7 +66,8 @@ function DirectLinks({ channels }: { channels: readonly ContactLink[] }) {
 /**
  * Quotation form (planning/MASTER_PLAN.md §7). Delivery depends on configuration: POST to the form
  * endpoint; without one, hand the request to the visitor's email app and say plainly that it is not
- * sent yet; with neither, the form is shown disabled with an explanation.
+ * sent yet; in TEMPORARY demo mode the form can be tried, but nothing is sent and the outcome says so;
+ * otherwise the form is shown disabled with an explanation.
  */
 export function QuoteForm({
   id,
@@ -74,6 +75,7 @@ export function QuoteForm({
   services,
   endpoint,
   email,
+  demo,
   channels,
 }: {
   id: string;
@@ -81,9 +83,10 @@ export function QuoteForm({
   services: readonly QuoteServiceOption[];
   endpoint: string | null;
   email: string | null;
+  demo: boolean;
   channels: readonly ContactLink[];
 }) {
-  const delivery = endpoint ? "endpoint" : email ? "email" : "unavailable";
+  const delivery = endpoint ? "endpoint" : email ? "email" : demo ? "demo" : "unavailable";
   const [values, setValues] = useState<QuoteValues>(() => ({ ...emptyQuote, service: defaultService ?? "" }));
   const [errors, setErrors] = useState<QuoteErrors>({});
   const [attempted, setAttempted] = useState(false);
@@ -104,7 +107,7 @@ export function QuoteForm({
 
   // Move focus to the outcome so keyboard and screen reader users land on it.
   useEffect(() => {
-    if (status === "sent" || status === "handoff" || status === "failed") outcomeRef.current?.focus();
+    if (status === "sent" || status === "handoff" || status === "demo" || status === "failed") outcomeRef.current?.focus();
   }, [status]);
 
   const applyQueryService = useCallback((slug: ServiceSlug) => setValues((current) => ({ ...current, service: slug })), []);
@@ -168,6 +171,13 @@ export function QuoteForm({
     if (invalid.length > 0) {
       setAnnouncement(invalid.length === 1 ? "One field needs attention." : `${invalid.length} fields need attention.`);
       focusField(invalid[0]);
+      return;
+    }
+
+    if (delivery === "demo") {
+      // Demo mode: nothing leaves the browser, and the outcome says so.
+      setAnnouncement("");
+      setStatus("demo");
       return;
     }
 
@@ -242,6 +252,33 @@ export function QuoteForm({
             Send another request
           </Button>
         </div>
+      ) : status === "demo" ? (
+        <div className="mt-8 flex flex-col items-start gap-5 border-t border-line pt-8">
+          <Info aria-hidden className="size-9 text-highlight" />
+          <h3 ref={outcomeRef} tabIndex={-1} className={outcomeHeading}>
+            Demo only: request not sent
+          </h3>
+          <p className="max-w-[60ch] text-body text-ink-muted">
+            This form is in demo mode, so <strong className="font-semibold text-ink">nothing was sent</strong> and FMECC
+            has not received your request. Online requests will work once FMECC&rsquo;s form service is connected.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" onClick={() => backToForm(false)}>
+              Edit request
+            </Button>
+            <Button variant="ghost" onClick={() => backToForm(true)}>
+              Start again
+            </Button>
+          </div>
+          <details className="w-full">
+            <summary className="type-label inline-flex min-h-11 cursor-pointer items-center rounded-sm text-ink-muted hover:text-ink">
+              Show the request text
+            </summary>
+            <pre className="mt-3 max-h-80 overflow-auto rounded-md border border-line bg-surface-muted p-4 font-mono text-body-sm whitespace-pre-wrap text-ink">
+              {text}
+            </pre>
+          </details>
+        </div>
       ) : status === "handoff" && mailto ? (
         <div className="mt-8 flex flex-col items-start gap-5 border-t border-line pt-8">
           <Mail aria-hidden className="size-9 text-highlight" />
@@ -297,6 +334,19 @@ export function QuoteForm({
                 <span>
                   Online quotation requests are not connected yet, so this form cannot be sent.
                   {channels.length > 0 && " Please contact FMECC directly using the details on this page."}
+                </span>
+              </p>
+            )}
+
+            {delivery === "demo" && (
+              <p
+                id={fieldId("delivery")}
+                className="mb-8 flex gap-3 rounded-md border border-line-strong bg-surface-muted p-4 text-body-sm text-ink"
+              >
+                <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-highlight" />
+                <span>
+                  <strong className="font-semibold">Demo mode.</strong> Online quotation requests are not connected yet.
+                  You can try the form, but nothing is sent to FMECC.
                 </span>
               </p>
             )}
@@ -499,7 +549,13 @@ export function QuoteForm({
                   aria-describedby={delivery === "endpoint" ? undefined : fieldId("delivery")}
                   className="max-sm:w-full"
                 >
-                  {delivery === "email" ? "Continue in email app" : status === "submitting" ? "Sending…" : "Send request"}
+                  {delivery === "email"
+                    ? "Continue in email app"
+                    : delivery === "demo"
+                      ? "Send demo request"
+                      : status === "submitting"
+                        ? "Sending…"
+                        : "Send request"}
                 </Button>
               </div>
             </fieldset>

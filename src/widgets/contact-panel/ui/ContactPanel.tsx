@@ -1,8 +1,8 @@
-import { Clock, MapPin } from "lucide-react";
+import { Clock, Mail, MapPin, MessageCircle, Phone, type LucideIcon } from "lucide-react";
 
 import { ContactChannels } from "@/features/contact-channels";
-import { contactLinks, site } from "@/shared/config";
-import { Eyebrow, IconTile, LinkButton } from "@/shared/ui";
+import { contactLinks, demoContactItems, site, type DemoContactItem } from "@/shared/config";
+import { Badge, Eyebrow, IconTile, LinkButton } from "@/shared/ui";
 
 // TODO(content): FMECC to confirm how enquiries are handled before these steps go live.
 const NEXT_STEPS = [
@@ -12,6 +12,14 @@ const NEXT_STEPS = [
 ];
 
 const isWebUrl = (url: string): url is `http${string}` => /^https?:\/\//.test(url);
+
+const demoIcons: Record<DemoContactItem["kind"], LucideIcon> = {
+  phone: Phone,
+  whatsapp: MessageCircle,
+  email: Mail,
+  address: MapPin,
+  hours: Clock,
+};
 
 /**
  * Direct contact beside the quotation form (planning/DESIGN.md §9.3): channels, office and hours.
@@ -73,8 +81,34 @@ export function ContactPanel() {
         </dl>
       )}
 
+      {/* TEMPORARY sample details (site.demoContact): plain text, never links; gone once real details exist. */}
+      {demoContactItems.length > 0 && (
+        <div>
+          <Badge>Sample details</Badge>
+          <p className="mt-4 max-w-[48ch] text-body-sm text-ink-subtle">
+            Temporary details for preview only. FMECC&rsquo;s confirmed contact information will replace them.
+          </p>
+          <dl className="mt-6 flex flex-col gap-6">
+            {demoContactItems.map((item) => (
+              <div key={item.kind} className="flex gap-4">
+                <dt className="shrink-0">
+                  <IconTile icon={demoIcons[item.kind]} />
+                  <span className="sr-only">{item.label}</span>
+                </dt>
+                <dd className="flex flex-col gap-1">
+                  <span aria-hidden className="type-label pt-1 text-ink-subtle">
+                    {item.label}
+                  </span>
+                  <span className="text-body whitespace-pre-line text-ink">{item.value}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+
       {/* Shown until FMECC supplies contact details in src/shared/config/site.ts. */}
-      {!hasDetails && (
+      {!hasDetails && demoContactItems.length === 0 && (
         <p className="border-y border-line py-5 text-body-sm text-ink-subtle">
           Direct phone, email and office details will be listed here once confirmed. In the meantime, please use the
           quotation form.

@@ -218,11 +218,13 @@ export interface SiteConfig {
   name: 'FMECC'; legalName: 'Future Middle East Construction Company'; url: string; locale: 'en';
   tagline: string; description: string;
   contact: { phone: string | null; whatsapp: string | null; email: string | null; address: string | null; hours: string | null; mapsUrl: string | null };
+  demoContact: { phone: string; whatsapp: string; email: string; address: string; hours: string } | null;  // TEMPORARY sample details; null before launch
   social: { linkedin: string | null; instagram: string | null; x: string | null };
   formEndpoint: string | null; analyticsId: string | null;
 }
 export const site: SiteConfig;                                        // null = not supplied → UI omits it
 export const contactLinks: readonly ContactLink[];                    // phone / WhatsApp / email that exist, with tel:, wa.me and mailto: hrefs
+export const demoContactItems: readonly DemoContactItem[];            // site.demoContact as labelled text (Contact page, footer only; never links, form or JSON-LD); empty once any real contact value is set
 export interface NavItem { label: string; href: Route; children?: { label: string; href: Route; description: string; icon: LucideIcon }[] }
 export const mainNav: NavItem[];  export const footerNav: { heading: string; items: { label: string; href: Route }[] }[];
 export const serviceNav: readonly { slug: ServiceSlug; label: string; description: string; icon: LucideIcon }[];
