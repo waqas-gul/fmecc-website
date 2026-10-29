@@ -88,25 +88,33 @@ export function ProjectFilterView({
             {status}
           </p>
         </div>
-        <div role="group" aria-labelledby={LABEL_ID} className="mt-4 flex flex-wrap gap-x-8 border-b border-line lg:mt-6 lg:gap-x-10">
-          <FilterTab
-            ref={allChipRef}
-            label="All"
-            count={total}
-            pressed={active === null}
-            transitions={transitions}
-            onClick={onSelect && (() => onSelect(null))}
-          />
-          {options.map((option) => (
+        {/* One row at every width: where the filters do not fit, the bar scrolls sideways (scrollbar
+            hidden) and runs to the screen edges, so the cut-off filter reads as more to swipe to. */}
+        <div
+          role="group"
+          aria-labelledby={LABEL_ID}
+          className="-mx-(--gutter) mt-4 overflow-x-auto px-(--gutter) [scrollbar-width:none] lg:mt-6 [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="flex w-max min-w-full gap-x-8 border-b border-line lg:gap-x-10">
             <FilterTab
-              key={option.slug}
-              label={option.label}
-              count={option.count}
-              pressed={active === option.slug}
+              ref={allChipRef}
+              label="All"
+              count={total}
+              pressed={active === null}
               transitions={transitions}
-              onClick={onSelect && (() => onSelect(option.slug))}
+              onClick={onSelect && (() => onSelect(null))}
             />
-          ))}
+            {options.map((option) => (
+              <FilterTab
+                key={option.slug}
+                label={option.label}
+                count={option.count}
+                pressed={active === option.slug}
+                transitions={transitions}
+                onClick={onSelect && (() => onSelect(option.slug))}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -165,7 +173,7 @@ function FilterTab({
       aria-controls={RESULTS_ID}
       onClick={onClick}
       className={cn(
-        "group/tab type-label relative inline-flex min-h-11 items-center gap-2 transition-colors duration-150 ease-standard lg:min-h-14",
+        "group/tab type-label relative inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap transition-colors duration-150 ease-standard lg:min-h-14",
         pressed ? "text-ink" : "text-ink-muted hover:text-ink",
       )}
     >
