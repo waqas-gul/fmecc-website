@@ -14,6 +14,21 @@ export function scrollProgress(rect: DOMRect, viewport: number, start: number, e
 }
 
 /**
+ * Progress, 0–1, tied to anchors in document order: each pairs an element edge (`top`, viewport
+ * coordinates) with the progress it marks (`at`). 0 until the first anchor reaches `line` (pixels
+ * from the viewport top), linear between consecutive anchors, 1 once the last has passed it.
+ */
+export function anchoredProgress(anchors: readonly { top: number; at: number }[], line: number) {
+  if (anchors.length === 0 || line < anchors[0].top) return 0;
+  for (let index = 1; index < anchors.length; index++) {
+    const from = anchors[index - 1];
+    const to = anchors[index];
+    if (line < to.top) return from.at + (to.at - from.at) * ((line - from.top) / (to.top - from.top));
+  }
+  return 1;
+}
+
+/**
  * Runs `measure` once per animation frame while the page scrolls or resizes, or a media query
  * flips, and once immediately. Passive listeners; returns the cleanup.
  */
