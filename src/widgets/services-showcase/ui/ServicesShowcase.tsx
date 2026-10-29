@@ -1,16 +1,16 @@
 import { ArrowRight } from "lucide-react";
 
 import { routes } from "@/shared/config";
-import { LinkButton, Section, SectionHeader } from "@/shared/ui";
-import { services } from "@/entities/service";
+import { LinkButton, Reveal, Section, SectionHeader } from "@/shared/ui";
+import { ServiceCard, services } from "@/entities/service";
 
 import { showcaseContent } from "../data/content";
 import { ServiceSwitcher, type SwitcherItem } from "./ServiceSwitcher";
 
 /**
- * The four services with strong media on Home (planning/DESIGN.md §8, row 3): a scroll switcher at
- * every width, pinned at ≥ 1024 px and with a pinned frame above the list below. The services
- * overview page uses `ServicePanels` from service-detail instead.
+ * The four services with strong media on Home (planning/DESIGN.md §8, row 3): pinned scroll
+ * switcher at ≥ 1024 px, stacked `ServiceCard`s below. The services overview page uses
+ * `ServicePanels` from service-detail instead.
  */
 export function ServicesShowcase() {
   const items: SwitcherItem[] = services.map((service) => ({
@@ -21,7 +21,6 @@ export function ServicesShowcase() {
     summary: service.summary,
     href: routes.service(service.slug),
     media: service.showcaseMedia,
-    wideMedia: service.hero,
   }));
 
   return (
@@ -33,8 +32,15 @@ export function ServicesShowcase() {
         </LinkButton>
       </div>
 
-      {/* Below 1024 px the pinned frame's header band is the top spacing. */}
-      <ServiceSwitcher items={items} className="lg:mt-16" />
+      <ServiceSwitcher items={items} className="mt-16 max-lg:hidden" />
+
+      <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:hidden">
+        {services.map((service, index) => (
+          <Reveal as="li" key={service.slug} delay={(index % 2) * 0.08} className="flex">
+            <ServiceCard service={service} className="flex-1" />
+          </Reveal>
+        ))}
+      </ul>
     </Section>
   );
 }
